@@ -1,7 +1,7 @@
 import React from 'react'
 import banner from '../assets/TopBanner.jpg'
 
-export default function TopBanner() {
+export default function TopBanner(props) {
   return (
     <div
             className='h-[300px] relative -mt-12'
