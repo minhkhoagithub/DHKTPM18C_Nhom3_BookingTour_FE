@@ -64,8 +64,8 @@ const settings = {
     useEffect(() => {
         const fetchTours = async () => {
             try {
-                const data = await getAllTours();
-                setTours(data.slice(0, 6));
+                const response = await getAllTours();              
+                setTours(response.slice(0, 6));
             } catch (error) {
                 console.error("Failed to fetch tours:", error);
             } finally {
@@ -94,23 +94,22 @@ const settings = {
                         <Slider {...settings}>
                             {tours.map((destination)=> (
                                 <div>
-                                    <div key={destination.name} className='overflow-hidden border shadow-lg shadow-gray-500 rounded-lg mb-5 mr-5'>
+                                    <div key={destination.tourId} className='overflow-hidden border shadow-lg shadow-gray-500 rounded-lg mb-5 mr-5'>
                                         <div className=''>
-                                            <img 
+                                            {/* <img 
                                             src={destination.img} 
                                             alt={destination.name} 
                                             width={600} 
                                             height={400}
                                             className='object-cover w-full h-48 hover:scale-110 transition-all'
-                                            />
+                                            /> */}                                          
                                             <div className='p-4'>
-                                                <p className='text-gray-500 flex items-center gap-1 text-sm mb-1'><Clock width={15}/>{destination.time}</p>
+                                                <p className='text-gray-500 flex items-center gap-1 text-sm mb-1'><Clock width={15}/>{destination.durationText}</p>
                                                 <h3 className='text-xl font-bold mb-2'>{destination.name}</h3>
-                                                <p className='flex gap-1 items-center'><Star width={20} fill='red'/>{destination.star}</p>
-                                                <p className='text-gray-600 mb-4 mt-2'>Experience the beauty and culture of {destination.name}</p>
+                                                <p className='text-gray-600 mb-4 mt-2'>{destination.description}</p>
                                                 <div className='flex gap-4'>
-                                                    <button className='px-3 py-2 bg-red-500 rounded-md text-white'>${destination.price}</button>
-                                                    <Link to={`/tour/${destination.name}`}>
+                                                    <button className='px-3 py-2 bg-red-500 rounded-md text-white'>${destination.basePrice}</button>
+                                                    <Link to={`/tour/${destination.tourId}`}>
                                                     <button className='px-3 py-2 bg-black rounded-md text-white'>Learn More</button>
                                                     </Link>
                                                 </div>

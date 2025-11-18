@@ -22,6 +22,8 @@ import ArticlesAdmin from "../components/admin/Articles";
 import ReviewsAdmin from "../components/admin/Reviews";
 import TourDetail from "../pages/tour/TourDetail"
 import ToursList from "../pages/tour/ToursList"
+import BookingPage from "../pages/BookingPage"
+import PaymentPage from "../pages/PaymentPage"
 export default function AppRouter () {
     return(
             <Routes>
@@ -32,6 +34,8 @@ export default function AppRouter () {
                     <Route path="tours" element={<ToursList />} />
                     <Route path="blog" element={<Blog />} />
                     <Route path="tour/:tourId" element={<TourDetail />} />
+                    <Route path="booking" element={<BookingPage />} />
+                    <Route path="payment" element={<PaymentPage />} />
                 </Route>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />

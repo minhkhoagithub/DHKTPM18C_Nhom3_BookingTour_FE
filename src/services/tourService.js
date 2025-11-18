@@ -6,6 +6,19 @@ import Tokyo from '../assets/Tokyo.jpg';
 import India from '../assets/India.jpg';
 import Venice from '../assets/Venice.jpg';
 
+
+// import { API_BASE_URL, getAuthHeader, handleResponse } from './apiClient';
+// export const getAllTours = async () => {
+//     try {
+//         // API này là public, không cần Auth Header
+//         const response = await fetch(`${API_BASE_URL}/client/tours`);
+//         return await handleResponse(response);
+//     } catch (error) {
+//         console.error('Failed to fetch tours:', error);
+//         throw error;
+//     }
+// };
+
 // Đây là "bảng" tour của chúng ta
 const mockTourDatabase = [
     { name: 'Baliya', img: Bali, time: '5 Days - 4 Nights', star: '3 (12 reviews)', price: '69,999', description: 'Trải nghiệm vẻ đẹp kỳ vĩ và văn hóa độc đáo của Bali...' },
@@ -20,40 +33,30 @@ const mockTourDatabase = [
 
 // -----------------------------------------------------------------
 // API LINK
-const API_BASE_URL = ''; // 
+const API_BASE_URL = 'http://localhost:8080/api/tours'; // 
 // -----------------------------------------------------------------
 
+fetch('http://localhost:8080/api/tours/01000000-0000-0000-0000-000000000203').then(response => response.json()).then(data => console.log(data)).catch(error => console.error('Error fetching tours:', error));
 
 /**
  * Lấy tất cả các tour
  */
-export const getAllTours = async () => {
-    
-    /* --- KHI CÓ API THẬT, BẠN SẼ DÙNG CODE NÀY (BỎ COMMENT RA) ---
+    export const getAllTours = async () => {
     if (!API_BASE_URL) {
         console.error("Vui lòng cung cấp API_BASE_URL trong tourService.js");
         throw new Error("API base URL is not configured");
     }
+
     try {
-        const response = await fetch(`${API_BASE_URL}/tours`);
+        const response = await fetch(`${API_BASE_URL}`);
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
         }
         return await response.json();
     } catch (error) {
-        console.error('Failed to fetch tours:', error);
-        throw error; // Ném lỗi ra để component xử lý
+        console.error("Failed to fetch tours from API:", error);
+        throw error; 
     }
-    */
-
-    // --- CODE GIẢ LẬP (ĐỂ TEST) ---
-    // (Sau này khi có API thật, bạn hãy xóa đoạn code "new Promise" này đi)
-    console.log("Mock API called: getAllTours");
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve(mockTourDatabase); // Trả về dữ liệu tĩnh
-        }, 500); // Giả lập độ trễ mạng
-    });
 };
 
 /**
@@ -62,24 +65,6 @@ export const getAllTours = async () => {
  */
 export const getTourByName = async (name) => {
 
-    /* --- KHI CÓ API THẬT, BẠN SẼ DÙNG CODE NÀY (BỎ COMMENT RA) ---
-    if (!API_BASE_URL) {
-        console.error("Vui lòng cung cấp API_BASE_URL trong tourService.js");
-        throw new Error("API base URL is not configured");
-    }
-    try {
-        const response = await fetch(`${API_BASE_URL}/tour/${name}`); // Hoặc /tours?name=${name}
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return await response.json();
-    } catch (error) {
-        console.error(`Failed to fetch tour ${name}:`, error);
-        throw error;
-    }
-    */
-   
-    // --- CODE GIẢ LẬP (ĐỂ TEST) ---
     // (Sau này khi có API thật, bạn hãy xóa đoạn code "new Promise" này đi)
     console.log(`Mock API called: getTourByName(${name})`);
     return new Promise((resolve, reject) => {
@@ -92,6 +77,25 @@ export const getTourByName = async (name) => {
             }
         }, 300);
     });
+};
+
+export const getTourById = async (id) => {
+    if (!API_BASE_URL) {
+        console.error("Vui lòng cung cấp API_BASE_URL trong tourService.js");
+        throw new Error("API base URL is not configured");
+    }
+    console.log(`Fetching tour with ID: ${id} from API`);
+    try {
+        const response = await fetch(`${API_BASE_URL}/${id}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        return data; 
+    } catch (error) {
+        console.error(`Failed to fetch tour with ID ${id}:`, error);
+        throw error;
+    }
 };
 
 /**

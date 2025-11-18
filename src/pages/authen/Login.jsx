@@ -1,8 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Mail, Lock } from 'lucide-react';
 import loginImage from '../../assets/Hero1.jpg'; 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { login } from '../../services/authService';
 export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Ngăn form reload trang
+    setError(null); // Xóa lỗi cũ
+
+    try {
+      // 3. Gọi API login từ authService
+      const data = await login(email, password);
+      
+      // 4. Đăng nhập thành công
+      console.log('Login successful:', data);
+
+      // 5. Chuyển hướng người dùng đến trang admin
+      // (Bạn có thể kiểm tra data.role ở đây nếu muốn)
+      navigate('/'); 
+
+    } catch (err) {
+      // 6. Xử lý lỗi đăng nhập
+      setError(err.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
+    }
+  };
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="relative flex flex-col m-6 space-y-8 bg-white shadow-2xl rounded-2xl md:flex-row md:space-y-0">
@@ -12,7 +37,7 @@ export default function Login() {
           <span className="font-light text-gray-400 mb-8">
             Vui lòng nhập thông tin chi tiết của bạn
           </span>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="py-4 relative">
                 <label htmlFor="email" className="text-md font-medium">Email</label>
                 <div className="relative">
@@ -22,8 +47,11 @@ export default function Login() {
                         id="email"
                         className="w-full p-2 pl-10 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
                         name="email"
+                        value={email}
                         placeholder="Nhập email của bạn"
                         autoComplete="email"
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
                     />
                 </div>
             </div>
@@ -32,13 +60,21 @@ export default function Login() {
                  <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                     <input
-                        type="password"
+                        // type="password"
                         id="pass"
                         className="w-full p-2 pl-10 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
                         name="password"
                         placeholder="Nhập mật khẩu của bạn"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
                     />
                 </div>
+                {error && (
+              <div className="text-red-500 text-sm my-2">
+                {error}
+              </div>
+            )}
             </div>
             <div className="flex justify-between w-full py-4">
               <div className="mr-24">

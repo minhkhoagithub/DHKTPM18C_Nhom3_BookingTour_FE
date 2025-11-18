@@ -51,7 +51,7 @@ export default function ToursList() {
                                         <p className='text-gray-600 mb-4 mt-2'>Experience the beauty and culture of {destination.name}</p>
                                         <div className='flex gap-4'>
                                             <button className='px-3 py-2 bg-red-500 rounded-md text-white'>${destination.price}</button>
-                                            <Link to={`/tour/${destination.name}`}>
+                                            <Link to={`/tour/${destination.tourId}`}>
                                                 <button className='px-3 py-2 bg-black rounded-md text-white'>Learn More</button>
                                             </Link>
                                         </div>
