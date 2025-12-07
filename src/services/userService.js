@@ -1,134 +1,119 @@
-// --- Dữ liệu giả lập (Mock Database) ---
-let mockUserDatabase = [
-    { id: 'USR-001', name: 'John Doe', email: 'john.doe@example.com', phone: '123-456-7890', role: 'Administrator' },
-    { id: 'USR-002', name: 'Jane Smith', email: 'jane.smith@example.com', phone: '987-654-3210', role: 'Customer' },
-    { id: 'USR-003', name: 'Peter Jones', email: 'peter.jones@example.com', phone: '555-123-4567', role: 'Customer' },
-    { id: 'USR-004', name: 'Mary Johnson', email: 'mary.j@example.com', phone: '444-555-6666', role: 'Tour Guide' },
-    { id: 'USR-005', name: 'David Brown', email: 'd.brown@example.com', phone: '222-333-4444', role: 'Customer' },
-];
-
-// -----------------------------------------------------------------
-const API_BASE_URL = ''; // <-- Điền API của bạn vào đây sau
-// -----------------------------------------------------------------
-
+const API_BASE_URL = "http://localhost:8080/api/admin/customers";
 
 /**
- * Lấy tất cả người dùng
+ * BE → FE mapping theo đúng entity
+ */
+const mapCustomer = (c) => ({
+  id: c.customerId,
+  name: c.name,
+  email: c.email,
+  phone: c.phone,
+  address: c.address,
+  loyaltyTier: c.loyaltyTier,
+});
+
+/**
+ * GET active customers
  */
 export const getAllUsers = async () => {
-    /* --- CODE API THẬT ---
-    if (!API_BASE_URL) throw new Error("API base URL is not configured");
-    try {
-        const response = await fetch(`${API_BASE_URL}/users`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        return await response.json();
-    } catch (error) {
-        console.error('Failed to fetch users:', error);
-        throw error;
-    }
-    */
+  const res = await fetch(`${API_BASE_URL}/active`);
+  if (!res.ok) throw new Error("Failed to fetch customers");
 
-    // --- CODE GIẢ LẬP ---
-    console.log("Mock API called: getAllUsers");
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve([...mockUserDatabase]); // Trả về bản sao
-        }, 500); 
-    });
+  const json = await res.json();
+  return json.data.map(mapCustomer);
 };
 
 /**
- * Thêm một người dùng mới (Mô phỏng POST)
- * @param {object} newUser Dữ liệu người dùng mới từ form
+ * POST create customer
  */
 export const addUser = async (newUser) => {
-    /* --- CODE API THẬT ---
-    if (!API_BASE_URL) throw new Error("API base URL is not configured");
-    try {
-        const response = await fetch(`${API_BASE_URL}/users`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newUser),
-        });
-        if (!response.ok) throw new Error('Failed to add user');
-        return await response.json();
-    } catch (error) {
-        console.error('Failed to add user:', error);
-        throw error;
-    }
-    */
-   
-    // --- CODE GIẢ LẬP ---
-    console.log("Mock API called: addUser", newUser);
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            // Tạo ID giả lập
-            const newId = `USR-${String(mockUserDatabase.length + 1).padStart(3, '0')}`;
-            const userToAdd = { ...newUser, id: newId };
-            
-            mockUserDatabase.unshift(userToAdd);
-            resolve(userToAdd); 
-        }, 500);
-    });
+  const payload = {
+    name: newUser.name,
+    email: newUser.email,
+    phone: newUser.phone,
+    address: newUser.address,
+    loyaltyTier: newUser.loyaltyTier,
+  };
+
+  const res = await fetch(API_BASE_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) throw new Error("Failed to add customer");
+  const json = await res.json();
+  return mapCustomer(json.data);
 };
 
 /**
- * CẬP NHẬT MỘT USER (Mô phỏng PUT/PATCH)
- * @param {string} id ID của user
- * @param {object} updatedUserData Dữ liệu user đã cập nhật
+ * PUT update customer
  */
-export const updateUser = async (id, updatedUserData) => {
-    /* --- CODE API THẬT (PUT) ---
-    if (!API_BASE_URL) throw new Error("API base URL is not configured");
-    const response = await fetch(`${API_BASE_URL}/users/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedUserData),
-    });
-    if (!response.ok) throw new Error('Failed to update user');
-    return await response.json();
-    */
-   
-    // --- CODE GIẢ LẬP ---
-    console.log(`Mock API called: updateUser(${id})`, updatedUserData);
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const index = mockUserDatabase.findIndex(u => u.id === id);
-            if (index !== -1) {
-                mockUserDatabase[index] = { ...mockUserDatabase[index], ...updatedUserData };
-                resolve(mockUserDatabase[index]);
-            } else {
-                reject(new Error('User not found for update'));
-            }
-        }, 500);
-    });
+export const updateUser = async (id, updatedUser) => {
+  const payload = {
+    name: updatedUser.name,
+    email: updatedUser.email,
+    phone: updatedUser.phone,
+    address: updatedUser.address,
+    loyaltyTier: updatedUser.loyaltyTier,
+  };
+
+  const res = await fetch(`${API_BASE_URL}/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) throw new Error("Failed to update customer");
+
+  const json = await res.json();
+  return mapCustomer(json.data);
 };
 
 /**
- * XÓA MỘT USER (Mô phỏng DELETE)
- * @param {string} id ID của user cần xóa
+ * DELETE (soft delete)
  */
 export const deleteUser = async (id) => {
-    /* --- CODE API THẬT (DELETE) ---
-    if (!API_BASE_URL) throw new Error("API base URL is not configured");
-    const response = await fetch(`${API_BASE_URL}/users/${id}`, {
-        method: 'DELETE',
-    });
-    if (!response.ok) throw new Error('Failed to delete user');
-    return { success: true };
-    */
-   
-    // --- CODE GIẢ LẬP ---
-    console.log(`Mock API called: deleteUser(${id})`);
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const index = mockUserDatabase.findIndex(u => u.id === id);
-            if (index !== -1) {
-                mockUserDatabase.splice(index, 1);
-                resolve({ success: true });
-            } else {
-                reject(new Error('User not found for deletion'));
-            }
-        }, 500);
-    });
+  const res = await fetch(`${API_BASE_URL}/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) throw new Error("Failed to delete customer");
+
+  return true;
+};
+
+/**
+ * SEARCH keyword
+ */
+export const searchUser = async (keyword) => {
+  const res = await fetch(`${API_BASE_URL}/search?keyword=${keyword}`);
+
+  if (!res.ok) throw new Error("Search failed");
+
+  const json = await res.json();
+  return json.data.map(mapCustomer);
+};
+
+/**
+ * GET deleted customers
+ */
+export const getDeletedUsers = async () => {
+  const res = await fetch(`${API_BASE_URL}/deleted`);
+  if (!res.ok) throw new Error("Failed to fetch deleted customers");
+
+  const json = await res.json();
+  return json.data.map(mapCustomer);
+};
+
+/**
+ * RESTORE a deleted customer
+ */
+export const restoreUser = async (id) => {
+  const res = await fetch(`${API_BASE_URL}/${id}/restore`, {
+    method: "PUT",
+  });
+
+  if (!res.ok) throw new Error("Failed to restore customer");
+  return true;
 };

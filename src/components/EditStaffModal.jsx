@@ -1,40 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 
-export default function EditUserModal({
+export default function EditStaffModal({
   isOpen,
   onClose,
-  onUserUpdated,
-  userData,
+  onStaffUpdated,
+  staffData,
 }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [loyaltyTier, setLoyaltyTier] = useState("");
+  const [role, setRole] = useState("");
 
   useEffect(() => {
-    if (userData) {
-      setName(userData.name || "");
-      setEmail(userData.email || "");
-      setPhone(userData.phone || "");
-      setAddress(userData.address || "");
-      setLoyaltyTier(userData.loyaltyTier || "");
+    if (staffData) {
+      setName(staffData.name || "");
+      setEmail(staffData.email || "");
+      setPhone(staffData.phone || "");
+      setRole(staffData.role || "");
     }
-  }, [userData]);
+  }, [staffData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const updatedUser = {
-      name,
-      email,
-      phone,
-      address,
-      loyaltyTier,
-    };
-
-    onUserUpdated(userData.id, updatedUser);
+    onStaffUpdated(staffData.id, { name, email, phone, role });
     onClose();
   };
 
@@ -44,7 +33,7 @@ export default function EditUserModal({
     <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center">
       <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Edit Customer</h2>
+          <h2 className="text-2xl font-bold">Edit Staff</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-800"
@@ -59,9 +48,9 @@ export default function EditUserModal({
               <label className="block mb-1">Full Name</label>
               <input
                 type="text"
+                className="w-full px-3 py-2 border rounded-md"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md"
                 required
               />
             </div>
@@ -70,10 +59,9 @@ export default function EditUserModal({
               <label className="block mb-1">Email</label>
               <input
                 type="email"
+                className="w-full px-3 py-2 border rounded-md"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md"
-                required
               />
             </div>
 
@@ -81,33 +69,24 @@ export default function EditUserModal({
               <label className="block mb-1">Phone</label>
               <input
                 type="text"
+                className="w-full px-3 py-2 border rounded-md"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md"
               />
             </div>
 
             <div>
-              <label className="block mb-1">Address</label>
-              <input
-                type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md"
-              />
-            </div>
-
-            <div>
-              <label className="block mb-1">Loyalty Tier</label>
+              <label className="block mb-1">Role</label>
               <select
-                value={loyaltyTier}
-                onChange={(e) => setLoyaltyTier(e.target.value)}
                 className="w-full px-3 py-2 border rounded-md"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
               >
-                <option value="">None</option>
-                <option value="Bronze">BRONZE</option>
-                <option value="Silver">SILVER</option>
-                <option value="Gold">GOLD</option>
+                <option value="">Select</option>
+                <option value="Manager">Manager</option>
+                <option value="Staff">Staff</option>
+                <option value="Cleaner">Cleaner</option>
+                <option value="Driver">Driver</option>
               </select>
             </div>
           </div>
@@ -125,7 +104,7 @@ export default function EditUserModal({
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded-md"
             >
-              Update Customer
+              Update Staff
             </button>
           </div>
         </form>
