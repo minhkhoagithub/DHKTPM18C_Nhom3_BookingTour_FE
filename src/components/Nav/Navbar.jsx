@@ -3,13 +3,55 @@ import { Link } from 'react-router-dom';
 import { HiMenuAlt1 } from "react-icons/hi";
 import ResponsiveMenu from './ResponsiveMenu.jsx';
 import { useState, useEffect } from 'react';
+import { logout, getToken, getCurrentUser } from '../../services/authService';
 
 
 export default function Navbar() {
-  const [showMenu, setShowMenu] = useState(false)
-    const toggleMenu = ()=>{
-        setShowMenu(!showMenu)
-    }
+  const [showMenu, setShowMenu] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Lấy thông tin user khi component mount
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = getToken();
+        
+        if (!token) {
+          console.log("⚠️ Không có token, bỏ qua gọi getCurrentUser");
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+
+        console.log("🔑 Token tồn tại, gọi API /me");
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+        console.log("👤 Current user:", currentUser);
+      } catch (error) {
+        console.log("⚠️ Lỗi lấy user:", error);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const toggleMenu = () => {
+    setShowMenu(!showMenu);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setUser(null);
+    setShowMenu(false);
+  };
+
+  const handleLoginClick = () => {
+    setShowMenu(false);
+  };
    
   return (
     <header className={`mx-auto top-0 transition-all bg-transparent/75 py-6 z-10`} >
@@ -27,7 +69,32 @@ export default function Navbar() {
                 <Link to='/gallery'><li >Gallery</li></Link>
                 <Link to='/contact'><li >Contact</li></Link>
               </ul>
-              <button className='bg-red-500 text-white px-4 py-1 rounded-md font-semibold'>Book Now</button>
+              <div className='flex items-center gap-2'>
+                {user ? (
+                  <>
+                    <span className='text-white font-semibold px-4 py-1 rounded-md'>
+                      {user.customerName || user.name || user.email || 'User'}
+                    </span>
+                    <button 
+                      onClick={handleLogout}
+                      className='bg-red-500 text-white px-4 py-1 rounded-md font-semibold hover:bg-red-600'
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link to='/login' onClick={handleLoginClick}>
+                      <button className='bg-red-500 text-white px-4 py-1 rounded-md font-semibold hover:bg-red-600'>
+                        Login
+                      </button>
+                    </Link>
+                    <button className='bg-white text-black px-4 py-1 rounded-md font-semibold hover:bg-gray-200'>
+                      Book Now
+                    </button>
+                  </>
+                )}
+              </div>
             </nav>
             <HiMenuAlt1 
               onClick={toggleMenu} 
