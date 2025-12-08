@@ -6,6 +6,7 @@ import banner1 from '../assets/Hero1.jpg'
 import banner2 from '../assets/Hero3.jpg'
 import banner3 from '../assets/Hero4.jpg'
 import { Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Hero() {
     const settings = {
@@ -31,7 +32,9 @@ export default function Hero() {
                     <div className='flex flex-col space-y-8 justify-center items-center text-center px-5 md:px-0'>
                         <h1 className='text-white font-bold text-4xl lg:text-6xl'>Discover Your Next Adventure</h1>
                         <p className='text-white lg:text-lg lg:w-[700px]'>Explore breathtaking destinations, create unforgettable memories and embark on the journey of a lifetime.</p>
-                        <button className='bg-red-500 px-3 py-2 text-white rounded-md font-semibold'>Start Exploring</button>
+                        <Link to='/tours'>
+                                <p className='bg-red-500 px-3 py-2 rounded-md text-white'>Start Exploring</p>
+                                </Link>
                     </div>
                 </div>
                </div>
@@ -50,7 +53,9 @@ export default function Hero() {
                     <div className='flex flex-col space-y-8 justify-center items-center text-center px-5 md:px-0'>
                         <h1 className='text-white font-bold text-4xl lg:text-6xl'>Discover Your Next Adventure</h1>
                         <p className='text-white lg:text-lg lg:w-[700px]'>Explore breathtaking destinations, create unforgettable memories and embark on the journey of a lifetime.</p>
-                        <button className='bg-red-500 px-3 py-2 text-white rounded-md font-semibold'>Start Exploring</button>
+                        <Link to='/tours'>
+                                <p className='bg-red-500 px-3 py-2 rounded-md text-white'>Start Exploring</p>
+                                </Link>
                     </div>
                 </div>
                </div>
@@ -69,7 +74,9 @@ export default function Hero() {
                     <div className='flex flex-col space-y-8 justify-center items-center text-center px-5 md:px-0'>
                         <h1 className='text-white font-bold text-4xl lg:text-6xl'>Discover Your Next Adventure</h1>
                         <p className='text-white lg:text-lg lg:w-[700px]'>Explore breathtaking destinations, create unforgettable memories and embark on the journey of a lifetime.</p>
-                        <button className='bg-red-500 px-3 py-2 text-white rounded-md font-semibold'>Start Exploring</button>
+                       <Link to='/tours'>
+                               <p className='bg-red-500 px-3 py-2 rounded-md text-white'>Start Exploring</p>
+                        </Link>
                     </div>
                 </div>
                </div>

@@ -1,60 +1,87 @@
+const API_URL = "http://localhost:8080/api/auth";
 
+/**
+ * LOGIN WITH EMAIL + PASSWORD
+ */
+export async function login(email, password) {
+  try {
+    const response = await fetch(`${API_URL}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
 
-// Lấy API_BASE_URL (Giả sử bạn định nghĩa nó ở một nơi)
-const API_BASE_URL = 'http://localhost:8080/api'; 
+    const data = await response.json();
 
-// Hàm xử lý response chuẩn (copy từ tourService.js)
-const handleResponse = async (response) => {
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      throw new Error(data.message || "Sai email hoặc mật khẩu");
     }
-    const apiResponse = await response.json();
-    if (apiResponse.success) {
-        return apiResponse.data; // Chỉ trả về phần data
-    } else {
-        throw new Error(apiResponse.message || 'API call was not successful');
-    }
-};
+
+    // Lưu token
+    localStorage.setItem("token", data.data);
+
+    return data.data;
+  } catch (error) {
+    throw error;
+  }
+}
 
 /**
- * Gọi API login từ AuthController.java
- * @param {string} email
- * @param {string} password
+ * LOGIN WITH GOOGLE
  */
-export const login = async (email, password) => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-        });
+export async function loginWithGoogle(idToken) {
+  try {
+    const response = await fetch(`${API_URL}/google`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken })
+    });
 
-        const data = await handleResponse(response); 
+    const data = await response.json();
 
-        if (data.token) {
-
-            localStorage.setItem('jwt_token', data.token); 
-            
-            localStorage.setItem('user_email', data.email);
-        }
-        
-        return data;
-
-    } catch (error) {
-        console.error('Login failed:', error);
-        throw error;
+    if (!response.ok) {
+      throw new Error(data.message || "Google login thất bại");
     }
-};
+
+    // Lưu token
+    localStorage.setItem("token", data.data);
+
+    return data.data;
+  } catch (error) {
+    throw error;
+  }
+}
 
 /**
- * Xóa token khi logout
+ * LOGOUT
  */
-export const logout = () => {
-    localStorage.removeItem('jwt_token');
-    localStorage.removeItem('user_email');
-    // Chuyển hướng về trang chủ
-    window.location.href = '/'; 
-};
+export function logout() {
+  localStorage.removeItem("token");
+}
+
+/**
+ * LẤY TOKEN HIỆN TẠI
+ */
+export function getToken() {
+  return localStorage.getItem("token");
+}
+
+/**
+ * GỬI REQUEST CÓ KÈM BEARER TOKEN (dùng cho API cần đăng nhập)
+ */
+export async function authFetch(url, options = {}) {
+  const token = getToken();
+
+  const headers = {
+    ...options.headers,
+    Authorization: token ? `Bearer ${token}` : "",
+    "Content-Type": "application/json"
+  };
+
+  const response = await fetch(url, {
+    ...options,
+    headers
+  });
+
+  return response.json();
+}

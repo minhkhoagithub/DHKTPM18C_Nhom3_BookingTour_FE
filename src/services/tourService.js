@@ -1,42 +1,9 @@
-// --- Dữ liệu giả lập (Mock Database) ---
-// Chúng ta di chuyển dữ liệu cứng từ các component vào đây
-import Bali from '../assets/Bali.jpg';
-import Paris from '../assets/Paris.jpg';
-import Tokyo from '../assets/Tokyo.jpg';
-import India from '../assets/India.jpg';
-import Venice from '../assets/Venice.jpg';
 
-
-// import { API_BASE_URL, getAuthHeader, handleResponse } from './apiClient';
-// export const getAllTours = async () => {
-//     try {
-//         // API này là public, không cần Auth Header
-//         const response = await fetch(`${API_BASE_URL}/client/tours`);
-//         return await handleResponse(response);
-//     } catch (error) {
-//         console.error('Failed to fetch tours:', error);
-//         throw error;
-//     }
-// };
-
-// Đây là "bảng" tour của chúng ta
-const mockTourDatabase = [
-    { name: 'Baliya', img: Bali, time: '5 Days - 4 Nights', star: '3 (12 reviews)', price: '69,999', description: 'Trải nghiệm vẻ đẹp kỳ vĩ và văn hóa độc đáo của Bali...' },
-    { name: 'Venice', img: Venice, time: '5 Days - 4 Nights', star: '3 (12 reviews)', price: '69,999', description: 'Khám phá thành phố kênh đào lãng mạn Venice...' },
-    { name: 'Tokyo', img: Tokyo, time: '5 Days - 4 Nights', star: '3 (12 reviews)', price: '69,999', description: 'Đắm mình trong sự giao thoa giữa truyền thống và hiện đại tại Tokyo...' },
-    { name: 'India', img: India, time: '5 Days - 4 Nights', star: '3 (12 reviews)', price: '69,999', description: 'Chiêm ngưỡng vẻ đẹp hùng vĩ của đền Taj Mahal và khám phá văn hóa Ấn Độ...' },
-    { name: 'Paris', img: Paris, time: '5 Days - 4 Nights', star: '3 (12 reviews)', price: '69,999', description: 'Khám phá kinh đô ánh sáng Paris với tháp Eiffel và những con đường lãng mạn...' },
-    { name: 'Tokyo-2', img: Tokyo, time: '5 Days - 4 Nights', star: '3 (12 reviews)', price: '69,999', description: 'Một chuyến đi khác đến Tokyo...' },
-    { name: 'Bali-2', img: Bali, time: '5 Days - 4 Nights', star: '3 (12 reviews)', price: '69,999', description: 'Khám phá thêm về Bali...' },
-    { name: 'Paris-2', img: Paris, time: '5 Days - 4 Nights', star: '3 (12 reviews)', price: '69,999', description: 'Trải nghiệm Paris về đêm...' },
-];
-
-// -----------------------------------------------------------------
 // API LINK
 const API_BASE_URL = 'http://localhost:8080/api/tours'; // 
 // -----------------------------------------------------------------
 
-fetch('http://localhost:8080/api/tours/01000000-0000-0000-0000-000000000203').then(response => response.json()).then(data => console.log(data)).catch(error => console.error('Error fetching tours:', error));
+
 
 /**
  * Lấy tất cả các tour
@@ -170,27 +137,25 @@ export const updateTour = async (originalName, updatedTourData) => {
  * XÓA MỘT TOUR (Mô phỏng DELETE)
  * @param {string} name Tên của tour cần xóa
  */
-export const deleteTour = async (name) => {
-    /* --- CODE API THẬT (DELETE) ---
-    if (!API_BASE_URL) throw new Error("API base URL is not configured");
-    const response = await fetch(`${API_BASE_URL}/tours/${name}`, {
-        method: 'DELETE',
+const API_URL = "http://localhost:8080/api/admin/tours";
+
+export const deleteTour = async (id) => {
+  try {
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        // Nếu cần token:
+        // "Authorization": `Bearer ${yourToken}`
+      },
     });
-    if (!response.ok) throw new Error('Failed to delete tour');
-    return { success: true };
-    */
-   
-    // --- CODE GIẢ LẬP ---
-    console.log(`Mock API called: deleteTour(${name})`);
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const index = mockTourDatabase.findIndex(t => t.name === name);
-            if (index !== -1) {
-                mockTourDatabase.splice(index, 1); // Xóa 1 phần tử tại vị trí index
-                resolve({ success: true });
-            } else {
-                reject(new Error('Tour not found for deletion'));
-            }
-        }, 500);
-    });
+
+    if (!response.ok) throw new Error(`Failed to delete tour: ${response.status}`);
+
+    const result = await response.json();
+    return result; 
+  } catch (error) {
+    console.error(`Failed to delete tour ${id}:`, error);
+    throw error;
+  }
 };

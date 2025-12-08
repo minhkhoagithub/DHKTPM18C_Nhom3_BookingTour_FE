@@ -5,15 +5,15 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, userData
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
-    const [role, setRole] = useState('Customer');
-
-    // Điền dữ liệu cũ vào form
+    const [address, setAddress] = useState('');
+    const [loyaltyTier, setLoyaltyTier] = useState('SILVER'); 
     useEffect(() => {
         if (userData) {
             setName(userData.name || '');
             setEmail(userData.email || '');
             setPhone(userData.phone || '');
-            setRole(userData.role || 'Customer');
+            setAddress(userData.address || '');
+            setLoyaltyTier(userData.loyaltyTier || 'SILVER');
         }
     }, [userData]);
 
@@ -24,11 +24,11 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, userData
             name,
             email,
             phone,
-            role,
+            address,
+            loyaltyTier,
         };
         
-        // Gọi hàm update, truyền vào ID và DỮ LIỆU MỚI
-        onUserUpdated(userData.id, updatedUser);
+        onUserUpdated(userData.customerId, updatedUser);
         onClose();
     };
 
@@ -38,7 +38,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, userData
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center">
             <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold">Edit User</h2>
+                    <h2 className="text-2xl font-bold">Edit Customer</h2>
                     <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
                         <X size={24} />
                     </button>
@@ -56,6 +56,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, userData
                                 required
                             />
                         </div>
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                             <input
@@ -66,6 +67,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, userData
                                 required
                             />
                         </div>
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
                             <input
@@ -75,16 +77,27 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, userData
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                             />
                         </div>
+
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                            <input
+                                type="text"
+                                value={address}
+                                onChange={(e) => setAddress(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Loyalty Tier</label>
                             <select
-                                value={role}
-                                onChange={(e) => setRole(e.target.value)}
+                                value={loyaltyTier}
+                                onChange={(e) => setLoyaltyTier(e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white"
                             >
-                                <option value="Customer">Customer</option>
-                                <option value="Tour Guide">Tour Guide</option>
-                                <option value="Administrator">Administrator</option>
+                                <option value="SILVER">SILVER</option>
+                                <option value="GOLD">GOLD</option>
+                                <option value="PLATINUM">PLATINUM</option>
                             </select>
                         </div>
                     </div>
@@ -101,7 +114,7 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, userData
                             type="submit"
                             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                         >
-                            Update User
+                            Update Customer
                         </button>
                     </div>
                 </form>

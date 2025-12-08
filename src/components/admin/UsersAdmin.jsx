@@ -32,19 +32,19 @@ const UsersAdmin = () => {
             console.error("Failed to add user:", error);
         }
     };
-    const handleUpdateUser = async (id, updatedUserData) => {
+    const handleUpdateUser = async (customerId, updatedUserData) => {
         try {
-            await updateUser(id, updatedUserData);
+            await updateUser(customerId, updatedUserData);
             await fetchUsers(); // Tải lại
         } catch (error) {
             console.error("Failed to update user:", error);
         }
     };
-    const handleDeleteUser = async (id, name) => {
+    const handleDeleteUser = async (customerId) => {
         if (window.confirm(`Bạn có chắc muốn xóa người dùng: ${name}?`)) {
             try {
-                await deleteUser(id);
-                await fetchUsers(); // Tải lại
+                await deleteUser(customerId);
+                await fetchUsers(); 
             } catch (error) {
                 console.error("Failed to delete user:", error);
             }
@@ -106,20 +106,20 @@ const UsersAdmin = () => {
                             <th scope="col" className="px-6 py-3">Name</th>
                             <th scope="col" className="px-6 py-3">Email</th>
                             <th scope="col" className="px-6 py-3">Phone</th>
-                            <th scope="col" className="px-6 py-3">Role</th>
+                            <th scope="col" className="px-6 py-3">loyaltyTier</th>
                             <th scope="col" className="px-6 py-3 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {users.map((user) => (
-                            <tr key={user.id} className="bg-white border-b hover:bg-gray-50">
-                                <td className="px-6 py-4 font-medium text-gray-900">{user.id}</td>
+                            <tr key={user.customerId} className="bg-white border-b hover:bg-gray-50">
+                                <td className="px-6 py-4 font-medium text-gray-900">{user.customerId}</td>
                                 <td className="px-6 py-4">{user.name}</td>
                                 <td className="px-6 py-4">{user.email}</td>
                                 <td className="px-6 py-4">{user.phone}</td>
                                 <td className="px-6 py-4">
-                                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getRoleClass(user.role)}`}>
-                                        {user.role}
+                                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getRoleClass(user.loyaltyTier)}`}>
+                                        {user.loyaltyTier}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 flex justify-center items-center gap-3">
@@ -131,7 +131,7 @@ const UsersAdmin = () => {
                                         <Edit size={18} />
                                     </button>
                                     <button 
-                                        onClick={() => handleDeleteUser(user.id, user.name)}
+                                        onClick={() => handleDeleteUser(user.customerId)}
                                         className="text-red-600 hover:text-red-800" 
                                         title="Delete"
                                     >

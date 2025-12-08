@@ -12,27 +12,43 @@ export default function TourDetail() {
     const navigate = useNavigate();
     const [selectedDepartureId, setSelectedDepartureId] = useState('');
     const [guestCount, setGuestCount] = useState(1);
-    useEffect(() => {
-        const fetchTourDetail = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const response = await getTourById(tourId);
-                setTour(response);
-                if (response.departures && response.departures.length > 0) {
-                    setSelectedDepartureId(response.departures[0].departureId);
-                }
-                console.log('Fetched tour data:', response);
-            } catch (err) {
-                console.error(err);
-                setError('Tour not found');
-            } finally {
-                setLoading(false);
+   useEffect(() => {
+    const fetchTourDetail = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await getTourById(tourId);
+
+            // Lọc chỉ các departure đang mở
+            const openDepartures = response.departures
+                ? response.departures.filter(dep => dep.status === "OPEN")
+                : [];
+
+            // Gán lại tour nhưng thay departures = openDepartures
+            const updatedTour = { ...response, departures: openDepartures };
+
+            setTour(updatedTour);
+
+            // Nếu có chuyến mở → chọn chuyến đầu tiên
+            if (openDepartures.length > 0) {
+                setSelectedDepartureId(openDepartures[0].departureId);
+            } else {
+                setSelectedDepartureId("");
             }
-        };
-        
-        fetchTourDetail();
-    }, [tourId]);
+
+            console.log("Fetched tour data:", updatedTour);
+
+        } catch (err) {
+            console.error(err);
+            setError("Tour not found");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    fetchTourDetail();
+}, [tourId]);
 
     const handleBookingSubmit = (e) => {
         e.preventDefault(); 
