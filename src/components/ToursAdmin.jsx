@@ -36,14 +36,17 @@ export default function ToursAdmin() {
             console.error("Failed to add tour:", error);
         }
     };
-    const handleUpdateTour = async (originalName, updatedTourData) => {
+
+
+     const handleUpdateTour = async (id, updatedTourData) => {
         try {
-            await updateTour(originalName, updatedTourData);
+            await updateTour(id, updatedTourData);
             await fetchTours();
         } catch (error) {
             console.error("Failed to update tour:", error);
         }
     };
+
     const handleDeleteTour = async (id) => {
         if (window.confirm(`Bạn có chắc muốn xóa tour: ${id}?`)) {
             try {
@@ -93,7 +96,9 @@ export default function ToursAdmin() {
                     </tr>
                 </thead>
                 <tbody>
-                    {tours.map((tour, index) => (
+                    {tours.map((tour, index) => { 
+                        return (
+                        
                         <tr key={index} className="bg-white border-b hover:bg-gray-50">
                             {/* <td className="px-6 py-4 font-medium text-gray-900">{tour.id}</td> */}
                             <td className="px-6 py-4">{tour.name}</td>
@@ -119,7 +124,7 @@ export default function ToursAdmin() {
                                 </button>
                             </td>
                         </tr>
-                    ))}
+                    )})}
                 </tbody>
             </table>
         </div>
