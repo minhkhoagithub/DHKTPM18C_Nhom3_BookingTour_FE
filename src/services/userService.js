@@ -1,119 +1,119 @@
-
-// -----------------------------------------------------------------
-const API_URL = "http://localhost:8080/api/admin/customers";
+const API_BASE_URL = "http://localhost:8080/api/admin/customers";
 
 /**
- * Lấy tất cả người dùng
+ * BE → FE mapping theo đúng entity
+ */
+const mapCustomer = (c) => ({
+  id: c.customerId,
+  name: c.name,
+  email: c.email,
+  phone: c.phone,
+  address: c.address,
+  loyaltyTier: c.loyaltyTier,
+});
+
+/**
+ * GET active customers
  */
 export const getAllUsers = async () => {
-  
+  const res = await fetch(`${API_BASE_URL}/active`);
+  if (!res.ok) throw new Error("Failed to fetch customers");
 
-  try {
-    const response = await fetch(API_URL, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        // Nếu API cần token, thêm ở đây:
-        // "Authorization": `Bearer ${yourToken}`
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Network response was not ok: ${response.status}`);
-    }
-
-    const result = await response.json();
-
-    if (!result.success) {
-      throw new Error(result.message || "Failed to fetch users");
-    }
-
-    // Trả về mảng customers
-    return result.data;
-
-  } catch (error) {
-    console.error("Failed to fetch users:", error);
-    throw error;
-  }
+  const json = await res.json();
+  return json.data.map(mapCustomer);
 };
 
 /**
- * Thêm một người dùng mới (Mô phỏng POST)
- * @param {object} newUser Dữ liệu người dùng mới từ form
+ * POST create customer
  */
 export const addUser = async (newUser) => {
-  try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // "Authorization": `Bearer ${yourToken}`
-      },
-      body: JSON.stringify(newUser),
-    });
+  const payload = {
+    name: newUser.name,
+    email: newUser.email,
+    phone: newUser.phone,
+    address: newUser.address,
+    loyaltyTier: newUser.loyaltyTier,
+  };
 
-    if (!response.ok) throw new Error(`Failed to add user: ${response.status}`);
+  const res = await fetch(API_BASE_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 
-    const result = await response.json();
-    return result.data; 
-  } catch (error) {
-    console.error("Failed to add user:", error);
-    throw error;
-  }
+  if (!res.ok) throw new Error("Failed to add customer");
+  const json = await res.json();
+  return mapCustomer(json.data);
 };
 
-
-
 /**
- * CẬP NHẬT MỘT USER (Mô phỏng PUT/PATCH)
- * @param {string} id ID của user
- * @param {object} updatedUserData Dữ liệu user đã cập nhật
+ * PUT update customer
  */
-/**
- * Cập nhật thông tin một user
- * @param {string} id ID của user
- * @param {object} updatedUserData Dữ liệu user cập nhật
- */
-export const updateUser = async (id, updatedUserData) => {
-  try {
-    const response = await fetch(`${API_URL}/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        // "Authorization": `Bearer ${yourToken}`
-      },
-      body: JSON.stringify(updatedUserData),
-    });
+export const updateUser = async (id, updatedUser) => {
+  const payload = {
+    name: updatedUser.name,
+    email: updatedUser.email,
+    phone: updatedUser.phone,
+    address: updatedUser.address,
+    loyaltyTier: updatedUser.loyaltyTier,
+  };
 
-    if (!response.ok) throw new Error(`Failed to update user: ${response.status}`);
+  const res = await fetch(`${API_BASE_URL}/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 
-    const result = await response.json();
-    return result.data; // Trả về user vừa cập nhật
-  } catch (error) {
-    console.error(`Failed to update user ${id}:`, error);
-    throw error;
-  }
+  if (!res.ok) throw new Error("Failed to update customer");
+
+  const json = await res.json();
+  return mapCustomer(json.data);
 };
+
 /**
- * Xóa một user
- * @param {string} id ID của user cần xóa
+ * DELETE (soft delete)
  */
 export const deleteUser = async (id) => {
-  try {
-    const response = await fetch(`${API_URL}/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        // "Authorization": `Bearer ${yourToken}`
-      },
-    });
+  const res = await fetch(`${API_BASE_URL}/${id}`, {
+    method: "DELETE",
+  });
 
-    if (!response.ok) throw new Error(`Failed to delete user: ${response.status}`);
+  if (!res.ok) throw new Error("Failed to delete customer");
 
-    const result = await response.json();
-    return result.success; // Trả về true/false
-  } catch (error) {
-    console.error(`Failed to delete user ${id}:`, error);
-    throw error;
-  }
+  return true;
+};
+
+/**
+ * SEARCH keyword
+ */
+export const searchUser = async (keyword) => {
+  const res = await fetch(`${API_BASE_URL}/search?keyword=${keyword}`);
+
+  if (!res.ok) throw new Error("Search failed");
+
+  const json = await res.json();
+  return json.data.map(mapCustomer);
+};
+
+/**
+ * GET deleted customers
+ */
+export const getDeletedUsers = async () => {
+  const res = await fetch(`${API_BASE_URL}/deleted`);
+  if (!res.ok) throw new Error("Failed to fetch deleted customers");
+
+  const json = await res.json();
+  return json.data.map(mapCustomer);
+};
+
+/**
+ * RESTORE a deleted customer
+ */
+export const restoreUser = async (id) => {
+  const res = await fetch(`${API_BASE_URL}/${id}/restore`, {
+    method: "PUT",
+  });
+
+  if (!res.ok) throw new Error("Failed to restore customer");
+  return true;
 };
