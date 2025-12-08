@@ -25,6 +25,7 @@ import ToursList from "../pages/tour/ToursList"
 import BookingPage from "../pages/BookingPage"
 import PaymentPage from "../pages/PaymentPage"
 import Gallery from "../components/GalleryComp"
+import BlogDetail from "../pages/blog/BlogDetail"; 
 export default function AppRouter () {
     return(
             <Routes>
@@ -35,6 +36,7 @@ export default function AppRouter () {
                     <Route path="tours" element={<ToursList />} />
                     <Route path="gallery" element={<Gallery />} />
                     <Route path="blog" element={<Blog />} />
+                    <Route path="blog/:postId" element={<BlogDetail />} />
                     <Route path="tour/:tourId" element={<TourDetail />} />
                     <Route path="booking" element={<BookingPage />} />
                     <Route path="payment" element={<PaymentPage />} />

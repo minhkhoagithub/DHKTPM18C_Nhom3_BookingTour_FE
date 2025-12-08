@@ -68,6 +68,7 @@ export default function Navbar() {
                 <Link to='/tours'><li >Tours</li></Link>
                 <Link to='/gallery'><li >Gallery</li></Link>
                 <Link to='/contact'><li >Contact</li></Link>
+                <Link to='/blog'><li >Blog</li></Link>
               </ul>
               <div className='flex items-center gap-2'>
                 {user ? (
