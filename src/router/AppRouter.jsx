@@ -31,6 +31,7 @@ import StaffDashboard from "../pages/staff/StaffDashBoard"
 import StaffChatDetail from "../pages/staff/StaffChatDetail"
 import StaffQueryPage from "../pages/staff/StaffQueryPage"
 import { PrivateStaffRoute } from "./PrivateRoute"
+import BlogDetail from "../pages/blog/BlogDetail"; 
 export default function AppRouter () {
     return(
             <Routes>
@@ -41,6 +42,7 @@ export default function AppRouter () {
                     <Route path="tours" element={<ToursList />} />
                     <Route path="gallery" element={<Gallery />} />
                     <Route path="blog" element={<Blog />} />
+                    <Route path="blog/:postId" element={<BlogDetail />} />
                     <Route path="tour/:tourId" element={<TourDetail />} />
                     <Route path="booking" element={<BookingPage />} />
                     <Route path="payment" element={<PaymentPage />} />
