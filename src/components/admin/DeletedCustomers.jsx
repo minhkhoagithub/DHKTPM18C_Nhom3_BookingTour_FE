@@ -80,7 +80,7 @@ const DeletedCustomers = () => {
         <ArrowLeft
           size={24}
           className="cursor-pointer"
-          onClick={() => navigate("/admin/customers")}
+          onClick={() => navigate("/admin/users")}
         />
         <h2 className="text-2xl font-bold">Deleted Customers</h2>
       </div>
@@ -119,9 +119,11 @@ const DeletedCustomers = () => {
           onChange={(e) => setTierFilter(e.target.value)}
         >
           <option value="ALL">All Tiers</option>
+          <option value="GUEST">Guest</option>
           <option value="BRONZE">Bronze</option>
           <option value="SILVER">Silver</option>
           <option value="GOLD">Gold</option>
+          <option value="PLATINUM">Platinum</option>
         </select>
       </div>
 
