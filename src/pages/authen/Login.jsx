@@ -2,33 +2,87 @@ import React, { useState, useEffect } from 'react';
 import { Mail, Lock } from 'lucide-react';
 import loginImage from '../../assets/Hero1.jpg';
 import { Link, useNavigate } from 'react-router-dom';
-import { login } from '../../services/authService';
+import { login, setUserInfo } from '../../services/authService';
+import {jwtDecode} from 'jwt-decode';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const [loaded, setLoaded] = useState(false);
 
   // =============================
-  // LOAD GOOGLE SDK
+  // LOAD GOOGLE SDK + RENDER BUTTON
   // =============================
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
     script.async = true;
     script.defer = true;
-    script.onload = () => setLoaded(true);
+
+    script.onload = () => {
+      if (window.google) {
+        window.google.accounts.id.initialize({
+          client_id:
+            "966637047245-uoe5suda8rfh3invm8k16kl5rfq8heuc.apps.googleusercontent.com",
+          callback: handleGoogleCallback,
+        });
+
+        // Render button ngay khi SDK load
+        window.google.accounts.id.renderButton(
+          document.getElementById("googleLoginDiv"),
+          {
+            theme: "outline",
+            size: "large",
+            width: 350,
+          }
+        );
+      }
+    };
+
     document.body.appendChild(script);
 
-    return () => {
-      document.body.removeChild(script);
-    };
+    return () => document.body.removeChild(script);
   }, []);
 
+  // GOOGLE CALLBACK
+  const handleGoogleCallback = async (response) => {
+    const idToken = response.credential;
+
+    try {
+      const res = await fetch("http://localhost:8080/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        localStorage.setItem("token", data.data);
+        
+        // Decode JWT token để lấy user info
+        const decodedToken = jwtDecode(data.data);
+        const userInfo = {
+          email: decodedToken.sub,
+          role: decodedToken.role,
+          customerId: decodedToken.customerId
+        };
+        setUserInfo(userInfo);
+        
+        console.log("Google login successful:", data);
+        console.log("User info từ token:", userInfo);
+        navigate("/");
+      } else {
+        setError(data.message || "Google login failed");
+      }
+    } catch (err) {
+      setError(err.message || "Google login failed");
+    }
+  };
+
   // =============================
-  // LOGIN WITH EMAIL/PASSWORD
+  // EMAIL/PASSWORD LOGIN
   // =============================
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,59 +90,22 @@ export default function Login() {
 
     try {
       const data = await login(email, password);
-      console.log('Login successful:', data);
-
-      navigate('/');
+      console.log("Login successful:", data);
+      
+      // Decode JWT token để lấy user info
+      const decodedToken = jwtDecode(data);
+      const userInfo = {
+        email: decodedToken.sub,
+        role: decodedToken.role,
+        customerId: decodedToken.customerId
+      };
+      setUserInfo(userInfo);
+      console.log("User info từ token:", userInfo);
+      
+      navigate("/");
     } catch (err) {
-      setError(err.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
+      setError(err.message || "Đăng nhập thất bại. Vui lòng thử lại.");
     }
-  };
-
-  // =============================
-  // LOGIN WITH GOOGLE
-  // =============================
-  const handleGoogleLogin = () => {
-    if (!loaded || !window.google) {
-      setError("Google chưa sẵn sàng, vui lòng thử lại.");
-      return;
-    }
-
-    window.google.accounts.id.initialize({
-      client_id: "628459552289-9vnrt1pd2glubmtvshucbmvq2kkmnsvq.apps.googleusercontent.com",
-      callback: async (response) => {
-        const idToken = response.credential;
-
-        try {
-          const res = await fetch("http://localhost:8080/api/auth/google", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ idToken }),
-          });
-
-          const data = await res.json();
-
-          if (res.ok) {
-            localStorage.setItem("token", data.data); 
-            console.log("Google login successful:", data);
-            navigate("/");
-          } else {
-            setError(data.message || "Google login failed");
-          }
-        } catch (err) {
-          setError(err.message || "Google login failed");
-        }
-      },
-    });
-
-    // Hiển thị nút Google
-    window.google.accounts.id.renderButton(
-      document.getElementById("googleLoginDiv"),
-      {
-        theme: "outline",
-        size: "large",
-        width: 350,
-      }
-    );
   };
 
   return (
@@ -105,13 +122,15 @@ export default function Login() {
           <form onSubmit={handleSubmit}>
             {/* EMAIL */}
             <div className="py-4 relative">
-              <label htmlFor="email" className="text-md font-medium">Email</label>
+              <label htmlFor="email" className="text-md font-medium">
+                Email
+              </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                 <input
                   type="email"
                   id="email"
-                  className="w-full p-2 pl-10 border border-gray-300 rounded-md placeholder:text-gray-500"
+                  className="w-full p-2 pl-10 border border-gray-300 rounded-md"
                   value={email}
                   placeholder="Nhập email của bạn"
                   onChange={(e) => setEmail(e.target.value)}
@@ -122,13 +141,15 @@ export default function Login() {
 
             {/* PASSWORD */}
             <div className="py-4 relative">
-              <label htmlFor="pass" className="text-md font-medium">Mật khẩu</label>
+              <label htmlFor="pass" className="text-md font-medium">
+                Mật khẩu
+              </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                 <input
                   type="password"
                   id="pass"
-                  className="w-full p-2 pl-10 border border-gray-300 rounded-md placeholder:text-gray-500"
+                  className="w-full p-2 pl-10 border border-gray-300 rounded-md"
                   placeholder="Nhập mật khẩu của bạn"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -136,23 +157,10 @@ export default function Login() {
                 />
               </div>
 
-              {error && (
-                <div className="text-red-500 text-sm my-2">
-                  {error}
-                </div>
-              )}
+              {error && <div className="text-red-500 text-sm my-2">{error}</div>}
             </div>
 
-            {/* REMEMBER + FORGOT */}
-            <div className="flex justify-between w-full py-4">
-              <div className="mr-24">
-                <input type="checkbox" className="mr-2" />
-                <span className="text-md">Ghi nhớ trong 30 ngày</span>
-              </div>
-              <span className="font-bold text-md cursor-pointer">Quên mật khẩu</span>
-            </div>
-
-            {/* SUBMIT BUTTON */}
+            {/* SUBMIT */}
             <button
               type="submit"
               className="w-full bg-red-500 text-white p-2 rounded-lg mb-6 hover:bg-white hover:text-black hover:border hover:border-gray-300"
@@ -160,29 +168,24 @@ export default function Login() {
               Đăng nhập
             </button>
 
-            {/* GOOGLE LOGIN BLOCK */}
+            {/* GOOGLE LOGIN */}
             <div className="text-center text-gray-400">
-              Chưa có tài khoản?
-              <Link to="/register">
-                <span className="font-bold text-black cursor-pointer"> Đăng ký miễn phí</span>
-              </Link>
+              <span>Hoặc đăng nhập bằng</span>
 
-              {/* GOOGLE BUTTON WILL RENDER HERE */}
-              <div id="googleLoginDiv" className="mt-6"></div>
+              {/* GOOGLE BUTTON LOCATION */}
+              <div id="googleLoginDiv" className="mt-4 flex justify-center"></div>
 
-              {/* BUTTON TO LOAD GOOGLE BUTTON */}
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                className="w-full mt-4 bg-blue-500 text-white p-2 rounded-lg hover:bg-white hover:text-black hover:border hover:border-gray-300"
-              >
-                Hiện nút đăng nhập Google
-              </button>
+              <div className="mt-6">
+                Chưa có tài khoản?
+                <Link to="/register">
+                  <span className="font-bold text-black cursor-pointer"> Đăng ký miễn phí</span>
+                </Link>
+              </div>
             </div>
           </form>
         </div>
 
-        {/* RIGHT SIDE IMAGE */}
+        {/* RIGHT SIDE */}
         <div className="relative">
           <img
             src={loginImage}

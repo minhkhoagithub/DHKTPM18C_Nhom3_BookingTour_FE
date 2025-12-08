@@ -13,15 +13,19 @@ export async function login(email, password) {
 
     const data = await response.json();
 
+    console.log("Login response từ BE:", data);
+
     if (!response.ok) {
       throw new Error(data.message || "Sai email hoặc mật khẩu");
     }
 
     // Lưu token
     localStorage.setItem("token", data.data);
+    console.log("✓ Token đã lưu:", data.data);
 
     return data.data;
   } catch (error) {
+    console.error("❌ Login error:", error);
     throw error;
   }
 }
@@ -39,15 +43,19 @@ export async function loginWithGoogle(idToken) {
 
     const data = await response.json();
 
+    console.log("Google login response từ BE:", data);
+
     if (!response.ok) {
       throw new Error(data.message || "Google login thất bại");
     }
 
     // Lưu token
     localStorage.setItem("token", data.data);
+    console.log("✓ Token từ Google đã lưu:", data.data);
 
     return data.data;
   } catch (error) {
+    console.error("❌ Google login error:", error);
     throw error;
   }
 }
@@ -57,13 +65,39 @@ export async function loginWithGoogle(idToken) {
  */
 export function logout() {
   localStorage.removeItem("token");
+  localStorage.removeItem("userInfo");
+  console.log("✓ Token và User info đã xóa");
 }
 
 /**
  * LẤY TOKEN HIỆN TẠI
  */
 export function getToken() {
-  return localStorage.getItem("token");
+  const token = localStorage.getItem("token");
+  console.log("🔑 Token hiện tại:", token ? "Có token" : "Không có token");
+  return token;
+}
+
+/**
+ * LƯU USER INFO
+ */
+export function setUserInfo(userInfo) {
+  if (userInfo) {
+    localStorage.setItem("userInfo", JSON.stringify(userInfo));
+    console.log("✓ User info đã lưu:", userInfo);
+  } else {
+    console.warn("⚠️ Không có user info để lưu");
+  }
+}
+
+/**
+ * LẤY USER INFO
+ */
+export function getUserInfo() {
+  const userInfo = localStorage.getItem("userInfo");
+  const result = userInfo ? JSON.parse(userInfo) : null;
+  console.log("📋 User info từ localStorage:", result);
+  return result;
 }
 
 /**
@@ -85,3 +119,14 @@ export async function authFetch(url, options = {}) {
 
   return response.json();
 }
+
+export async function getCurrentUser() {
+  const token = getToken();
+  if (!token) return null;
+
+  const response = await authFetch(`${API_URL}/me`);
+
+  // BE trả về ApiResponse → data nằm trong response.data
+  return response.data || null;
+}
+
