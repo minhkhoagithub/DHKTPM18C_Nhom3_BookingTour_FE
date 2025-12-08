@@ -5,6 +5,10 @@ const API_URL = "http://localhost:8080/api/auth";
  */
 export async function login(email, password) {
   try {
+    // Xoá toàn bộ localStorage trước khi login mới
+    localStorage.clear();
+    console.log("✓ Đã xoá toàn bộ localStorage cũ");
+
     const response = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -35,6 +39,10 @@ export async function login(email, password) {
  */
 export async function loginWithGoogle(idToken) {
   try {
+    // Xoá toàn bộ localStorage trước khi login mới
+    localStorage.clear();
+    console.log("✓ Đã xoá toàn bộ localStorage cũ");
+
     const response = await fetch(`${API_URL}/google`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -64,9 +72,8 @@ export async function loginWithGoogle(idToken) {
  * LOGOUT
  */
 export function logout() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("userInfo");
-  console.log("✓ Token và User info đã xóa");
+  localStorage.clear();
+  console.log("✓ Đã xoá toàn bộ localStorage");
 }
 
 /**

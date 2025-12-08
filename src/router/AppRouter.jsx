@@ -6,6 +6,7 @@ import Blog from "../pages/blog/Blog"
 import MainLayout from "../layouts/MainLayout"
 import NotFound from "../pages/NotFound"
 import AdminLayout from "../layouts/AdminLayout"
+import StaffLayout from "../layouts/StaffLayout"
 import DashboardMain from "../components/DashboardMain"
 import ToursAdmin from "../components/ToursAdmin"
 import BookingsAdmin from "../components/admin/BookingsAdmin"
@@ -18,6 +19,7 @@ import PricePoliciesAdmin from "../components/admin/PricePoliciesAdmin"
 import SettingsAdmin from "../components/admin/SettingsAdmin"
 import Login from "../pages/authen/Login"
 import Register from "../pages/authen/Register"
+import StaffLogin from "../pages/authen/StaffLogin"
 import ArticlesAdmin from "../components/admin/Articles";
 import ReviewsAdmin from "../components/admin/Reviews";
 import TourDetail from "../pages/tour/TourDetail"
@@ -25,6 +27,10 @@ import ToursList from "../pages/tour/ToursList"
 import BookingPage from "../pages/BookingPage"
 import PaymentPage from "../pages/PaymentPage"
 import Gallery from "../components/GalleryComp"
+import StaffDashboard from "../pages/staff/StaffDashBoard"
+import StaffChatDetail from "../pages/staff/StaffChatDetail"
+import StaffQueryPage from "../pages/staff/StaffQueryPage"
+import { PrivateStaffRoute } from "./PrivateRoute"
 export default function AppRouter () {
     return(
             <Routes>
@@ -41,6 +47,24 @@ export default function AppRouter () {
                 </Route>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/staff/login" element={<StaffLogin />} />
+                <Route path="/staff" element={<StaffLayout />}>
+                    <Route path="dashboard" element={
+                        <PrivateStaffRoute>
+                            <StaffDashboard />
+                        </PrivateStaffRoute>
+                    } />
+                    <Route path="chat/:sessionId" element={
+                        <PrivateStaffRoute>
+                            <StaffChatDetail />
+                        </PrivateStaffRoute>
+                    } />
+                    <Route path="query" element={
+                        <PrivateStaffRoute>
+                            <StaffQueryPage />
+                        </PrivateStaffRoute>
+                    } />
+                </Route>
                 <Route path="/admin" element={<AdminLayout />} >
                     <Route index element={<DashboardMain />} />
                     <Route path="tours" element={<ToursAdmin/>} />
