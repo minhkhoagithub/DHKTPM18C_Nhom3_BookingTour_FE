@@ -87,7 +87,7 @@ export default function DashboardMain() {
     const handleDownloadReport = async () => {
         try {
             setDownloading(true);
-            const response = await axiosClient.get('/statistics/reports/revenue-pdf', {
+            const response = await axiosClient.get('admin/statistics/reports/revenue-pdf', {
                 responseType: 'blob' 
             });
             const blob = new Blob([response], { type: 'application/pdf' });
