@@ -1,91 +1,47 @@
 import React, { useEffect, useState } from "react";
-import { getCurrentUser } from "../services/authService";
-import { getAllTours } from "../services/tourService";
 import { useNavigate } from "react-router-dom";
 import { Clock } from "lucide-react";
+import { getAllTours } from "../services/tourService";
+import { getCurrentUser } from "../services/authService";
+import { getFavList, saveFavList } from "../utils/favoriteUtils";
 
 export default function Favourite() {
   const [favorites, setFavorites] = useState([]);
+  const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // -------------------- FIXED RANDOM --------------------
-
-  function uuidToSeed(uuid) {
-    let num = 0;
-    for (let i = 0; i < uuid.length; i++) {
-      num = (num * 31 + uuid.charCodeAt(i)) % 1000000007;
-    }
-    return num;
-  }
-
-  function makeRandom(seed) {
-    return function () {
-      seed = (seed * 16807) % 2147483647;
-      return (seed - 1) / 2147483646;
-    };
-  }
-
-  function pickSeededTours(allTours, seed, count = 10) {
-    const rand = makeRandom(seed);
-    const selected = [];
-    const used = new Set();
-
-    for (let i = 0; i < Math.min(count, allTours.length); i++) {
-      let r;
-      do {
-        r = Math.floor(rand() * allTours.length);
-      } while (used.has(r));
-
-      used.add(r);
-      selected.push(allTours[r]);
-    }
-
-    return selected;
-  }
-
-  const loadRecommendedTours = async () => {
+  const loadFavoriteTours = async () => {
     try {
       const user = await getCurrentUser();
-
-      if (!user || !user.customerId) {
-        setLoading(false); // IMPORTANT FIX
+      if (!user?.customerId) {
         navigate("/login");
         return;
       }
 
-      let apiRes = await getAllTours();
-      console.log("📌 API Tours:", apiRes);
+      setUserId(user.customerId);
 
-      // If API returns { success, data }, normalize it
-      const allTours = apiRes.data || apiRes;
+      const favIds = getFavList(user.customerId);
+      const allTours = await getAllTours();
 
-      if (!Array.isArray(allTours)) {
-        console.error("❌ allTours không phải là array:", allTours);
-        setLoading(false);
-        return;
-      }
-
-      const seed = uuidToSeed(user.customerId);
-      const recommended = pickSeededTours(allTours, seed, 10);
-
-      setFavorites(recommended);
-    } catch (error) {
-      console.error("Lỗi khi tạo danh sách tour gợi ý:", error);
+      const favTours = allTours.filter((t) => favIds.includes(t.tourId));
+      setFavorites(favTours);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadRecommendedTours();
+    loadFavoriteTours();
   }, []);
 
-  //   const formatCurrency = (amount) =>
-  //     new Intl.NumberFormat("vi-VN", {
-  //       style: "currency",
-  //       currency: "VND",
-  //     }).format(amount);
+  const removeFavorite = async (tourId) => {
+    const favIds = getFavList(userId);
+    const newList = favIds.filter((id) => id !== tourId);
+    saveFavList(userId, newList);
+
+    setFavorites((prev) => prev.filter((t) => t.tourId !== tourId));
+  };
 
   if (loading)
     return <div className="min-h-screen pt-24 text-center">Đang tải...</div>;
@@ -94,61 +50,56 @@ export default function Favourite() {
     <div className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-800 mb-8 border-b pb-4">
-          Gợi Ý Dành Riêng Cho Bạn
+          Tour Yêu Thích Của Bạn
         </h1>
 
+        {favorites.length === 0 && (
+          <p className="text-center text-gray-500 text-lg">
+            Bạn chưa yêu thích tour nào.
+          </p>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {favorites.map((tour, index) => (
+          {favorites.map((tour) => (
             <div
-              key={index}
-              className="overflow-hidden border shadow-lg shadow-gray-500 rounded-lg"
+              key={tour.tourId}
+              className="overflow-hidden border shadow-lg rounded-lg flex flex-col"
             >
-              {/* ẢNH TOUR */}
               <img
-                src={tour.images?.[0]}
+                src={tour.images[0]}
                 alt={tour.name}
                 className="object-cover w-full h-48 hover:scale-110 transition-all"
               />
 
-              <div className="p-4">
-                {/* Duration */}
+              <div className="p-4 flex flex-col h-full">
                 <p className="text-gray-500 flex items-center gap-1 text-sm mb-1">
                   <Clock width={15} /> {tour.durationText}
                 </p>
 
-                {/* Tên Tour */}
-                <h3 className="text-xl font-bold mb-2 line-clamp-2">
+                <h3 className="text-xl font-bold mb-2 line-clamp-2 min-h-[3.5rem]">
                   {tour.name}
                 </h3>
 
-                {/* Mô tả */}
-                <p className="text-gray-600 mb-4 mt-2 line-clamp-3">
+                <p className="text-gray-600 mb-4 mt-2 line-clamp-3 min-h-[4.5rem]">
                   {tour.description}
                 </p>
 
-                {/* Giá + nút */}
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center mt-auto">
                   <h3 className="text-2xl font-bold text-red-500">
                     {tour.basePrice.toLocaleString("vi-VN")}₫
                   </h3>
 
                   <div className="flex gap-2">
-                    {/* Xem chi tiết */}
                     <button
                       onClick={() => navigate(`/tour/${tour.tourId}`)}
-                      className="px-3 py-2 bg-blue-500 rounded-md text-white"
+                      className="px-3 py-2 bg-blue-500 text-white rounded-md"
                     >
                       Xem chi tiết
                     </button>
 
-                    {/* Bỏ yêu thích */}
                     <button
-                      onClick={() =>
-                        setFavorites((prev) =>
-                          prev.filter((t) => t.tourId !== tour.tourId)
-                        )
-                      }
-                      className="px-3 py-2 bg-red-300 rounded-md text-gray-700"
+                      onClick={() => removeFavorite(tour.tourId)}
+                      className="px-3 py-2 bg-red-300 rounded-md"
                     >
                       Bỏ yêu thích
                     </button>
