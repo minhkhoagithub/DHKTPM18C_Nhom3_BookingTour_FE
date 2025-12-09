@@ -1,76 +1,158 @@
-import React from 'react';
-import { Edit, Trash2, PlusCircle, Search } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Edit, Trash2 } from 'lucide-react';
+// Import các hàm service (giả định đã được cập nhật để không cần tourId)
+// Bạn cần đảm bảo các hàm CRUD khác cũng không cần tourId, hoặc cập nhật logic tương ứng.
+import { getAllDepartures , addDeparture, deleteDeparture, updateDeparture} from "../../services/departureService"; 
+// Import các component Modal giả định
+import EditDepartureModal from "../EditDepartureModal";
+import AddDepartureModal from "../AddDepartureModal"; 
 
-const DeparturesAdmin = () => {
-    // Placeholder data
-    const departuresData = [
-        { id: 'DEP-001', tourName: 'Paris Adventure', departureDate: '2024-07-10', slots: 20, status: 'Open' },
-        { id: 'DEP-002', tourName: 'Tokyo Lights', departureDate: '2024-08-05', slots: 15, status: 'Open' },
-        { id: 'DEP-003', tourName: 'Bali Escape', departureDate: '2024-06-15', slots: 12, status: 'Full' },
-        { id: 'DEP-004', tourName: 'Venice Canals', departureDate: '2024-09-01', slots: 18, status: 'Open' },
-        { id: 'DEP-005', tourName: 'Paris Adventure', departureDate: '2024-05-20', slots: 20, status: 'Departed' },
-    ];
+/**
+ * Component quản lý TẤT CẢ các chuyến khởi hành (Departures).
+ * (Không còn nhận props tourId)
+ * @returns {JSX.Element}
+ */
+// 1. XÓA props { tourId }
+export default function DeparturesAdmin() { 
+    const [departures, setDepartures] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [currentDeparture, setCurrentDeparture] = useState(null);
 
-    const getStatusClass = (status) => {
-        switch (status) {
-            case 'Open': return 'bg-green-100 text-green-800';
-            case 'Full': return 'bg-orange-100 text-orange-800';
-            case 'Departed': return 'bg-gray-100 text-gray-800';
-            case 'Cancelled': return 'bg-red-100 text-red-800';
-            default: return 'bg-gray-100 text-gray-800';
+    // Hàm fetch danh sách chuyến khởi hành
+    const fetchDepartures = async () => {
+        // 2. XÓA logic kiểm tra tourId
+        
+        try {
+            // 3. Gọi hàm service mà KHÔNG TRUYỀN tourId
+            const data = await getAllDepartures();
+            setDepartures(data);
+        } catch (error) {
+            // Cập nhật thông báo lỗi
+            console.error("Failed to fetch all departures:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
+    // Gọi fetchDepartures chỉ một lần khi component mount
+    // 4. CẬP NHẬT useEffect để không theo dõi tourId
+    useEffect(() => {
+        fetchDepartures();
+    }, []); // Dependency array rỗng ([])
+
+    // --- CRUD Handlers ---
+
+    const handleAddNewDeparture = async (tourId, newDepartureData) => {
+    try {
+        await addDeparture(tourId, newDepartureData);
+        await fetchDepartures();
+        setIsAddModalOpen(false);
+    } catch (error) {
+        console.error("Failed to add departure:", error);
+    }
+};
+
+    const handleUpdateDeparture = async (departureId, updatedDepartureData) => {
+        try {
+            await updateDeparture(departureId, updatedDepartureData);
+            await fetchDepartures(); 
+            setIsEditModalOpen(false); 
+        } catch (error) {
+            console.error("Failed to update departure:", error);
+        }
+    };
+
+    const handleDeleteDeparture = async (departureId) => {
+        if (window.confirm(`Bạn có chắc muốn xóa chuyến khởi hành: ${departureId}?`)) {
+            try {
+                await deleteDeparture(departureId);
+                await fetchDepartures(); 
+            } catch (error) {
+                console.error("Failed to delete departure:", error);
+            }
+        }
+    };
+
+    // --- Modal Handlers ---
+
+    const openEditModal = (departure) => {
+        setCurrentDeparture(departure); 
+        setIsEditModalOpen(true); 
+    };
+
+    // --- Render Logic ---
+
+    if (loading) {
+        return (
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-2xl font-bold">Loading departure data...</h2>
+            </div>
+        );
+    }
+    
+    // 6. XÓA logic hiển thị lỗi "Please select a Tour" (vì bây giờ nó quản lý tất cả)
+    
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md animate-fade-in">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Departure Management</h2>
-                <button className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 flex items-center gap-2 transition-colors">
-                    <PlusCircle size={20} />
-                    <span>Add New Departure</span>
+        <div className="bg-white p-6 rounded-lg shadow-md mt-6">
+            <div className="flex justify-between items-center mb-4">
+                {/* 7. CẬP NHẬT tiêu đề */}
+                <h2 className="text-2xl font-bold">All Departures Management</h2>
+                 <button 
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                >
+                    Add New Departure
                 </button>
             </div>
             
-            <div className="mb-4">
-                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                    <input 
-                        type="text" 
-                        placeholder="Search by tour name..." 
-                        className="pl-10 pr-4 py-2 w-full max-w-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500"
-                    />
-                </div>
-            </div>
-
             <div className="overflow-x-auto">
+                {/* ... (Phần bảng giữ nguyên) */}
                 <table className="w-full text-sm text-left text-gray-500">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
-                            <th scope="col" className="px-6 py-3">Departure ID</th>
                             <th scope="col" className="px-6 py-3">Tour Name</th>
-                            <th scope="col" className="px-6 py-3">Departure Date</th>
-                            <th scope="col" className="px-6 py-3">Slots Available</th>
+                            <th scope="col" className="px-6 py-3">Start Date</th>
+                            <th scope="col" className="px-6 py-3">Seats Available</th>
                             <th scope="col" className="px-6 py-3">Status</th>
-                            <th scope="col" className="px-6 py-3 text-center">Actions</th>
+                            <th scope="col" className="px-6 py-3">Actions</th>
                         </tr>
-                    </thead>
+                    </thead>    
                     <tbody>
-                        {departuresData.map((departure) => (
-                            <tr key={departure.id} className="bg-white border-b hover:bg-gray-50">
-                                <td className="px-6 py-4 font-medium text-gray-900">{departure.id}</td>
-                                <td className="px-6 py-4">{departure.tourName}</td>
-                                <td className="px-6 py-4">{departure.departureDate}</td>
-                                <td className="px-6 py-4">{departure.slots}</td>
-                                <td className="px-6 py-4">
-                                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusClass(departure.status)}`}>
-                                        {departure.status}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 flex justify-center items-center gap-3">
-                                    <button className="text-blue-600 hover:text-blue-800" title="Edit">
+                        {departures.map((departure, index) => ( 
+                            <tr key={index} className="bg-white border-b hover:bg-gray-50">
+                                <td className="px-6 py-4 font-medium text-gray-900">{departure.tourName}</td>
+                                <td className="px-6 py-4">{new Date(departure.startDate).toLocaleDateString()}</td>
+                                <td className="px-6 py-4">{departure.availableSlots}</td>
+                             <td className="px-6 py-4">
+                                <span 
+                                    className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                        // Logic điều kiện để xác định class CSS dựa trên trạng thái
+                                        departure.status === 'OPEN'
+                                            ? 'bg-green-100 text-green-800' // Trạng thái Mở
+                                            : departure.status === 'CLOSED'
+                                            ? 'bg-gray-100 text-red-800'  // Trạng thái Đóng
+                                            : departure.status === 'CANCELLED'
+                                            ? 'bg-red-100 text-red-800'   // Trạng thái Hủy
+                                            : 'bg-gray-200 text-gray-600' // Trạng thái Mặc định (nếu có lỗi)
+                                    }`}
+                                >
+                                    {departure.status}
+                                </span>
+                            </td>
+                                
+                                <td className="px-6 py-4 flex items-center gap-2">
+                                    <button 
+                                        onClick={() => openEditModal(departure)}
+                                        className="text-blue-600 hover:text-blue-800"
+                                    >
                                         <Edit size={18} />
                                     </button>
-                                    <button className="text-red-600 hover:text-red-800" title="Delete">
+                                    <button 
+                                        onClick={() => handleDeleteDeparture(departure.departureId)}
+                                        className="text-red-600 hover:text-red-800"
+                                    >
                                         <Trash2 size={18} />
                                     </button>
                                 </td>
@@ -79,8 +161,26 @@ const DeparturesAdmin = () => {
                     </tbody>
                 </table>
             </div>
+
+            {/* Modal thêm chuyến khởi hành */}
+            <AddDepartureModal
+                isOpen={isAddModalOpen}
+                onClose={() => setIsAddModalOpen(false)}
+                onDepartureAdded={handleAddNewDeparture}
+                // 8. XÓA props tourId khỏi modal (hoặc truyền null/undefined nếu modal cần, nhưng tốt nhất là xóa)
+                // tourId={tourId} 
+            />
+            
+            {/* Modal chỉnh sửa chuyến khởi hành */}
+            <EditDepartureModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                onDepartureUpdated={handleUpdateDeparture}
+                departureData={currentDeparture} 
+                // 9. XÓA props tourId khỏi modal (hoặc truyền null/undefined)
+                // tourId={tourId}
+            />
+            
         </div>
     );
-};
-
-export default DeparturesAdmin;
+}
