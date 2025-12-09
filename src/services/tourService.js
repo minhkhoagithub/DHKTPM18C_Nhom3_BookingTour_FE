@@ -202,3 +202,39 @@ export const deleteTour = async (id) => {
     throw error;
   }
 };
+
+/**
+ * Lấy danh sách Tour có tên chứa chuỗi tìm kiếm (Frontend filtering).
+ * API này gọi getAllTours và lọc ở phía client.
+ * @param {string} searchName Chuỗi tìm kiếm tên tour
+ * @returns {Promise<Array<object>>} Danh sách các Tour khớp.
+ */
+export const getTourByNameContains = async (searchName) => {
+    if (!API_BASE_URL) {
+        console.error("Vui lòng cung cấp API_BASE_URL trong tourService.js");
+        throw new Error("API base URL is not configured");
+    }
+
+    if (!searchName || searchName.trim() === '') {
+        return [];
+    }
+
+    const searchUrl = `http://localhost:8080/api/admin/tours/search?name=${encodeURIComponent(searchName)}`; 
+
+    try {
+        const response = await fetch(searchUrl);
+        
+        if (!response.ok) {
+            throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+        }
+        
+        const apiResponse = await response.json();
+        
+        // 2. Trả về dữ liệu từ trường 'data' (đã được lọc và ánh xạ DTO ở backend)
+        return apiResponse.data || []; 
+
+    } catch (error) {
+        console.error("Failed to fetch tours from search API:", error);
+        throw error; 
+    }
+};
