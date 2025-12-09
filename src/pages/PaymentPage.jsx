@@ -12,35 +12,26 @@ export default function PaymentPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const [loading, setLoading] = useState(false);
+    const BANK_ID = "VCB"; 
 
-    // Đọc state được gửi từ BookingPage
+
     const { invoiceId, totalAmount } = location.state || {};
-
-    // Nếu không có state (người dùng gõ URL trực tiếp), quay về trang chủ
+const ACCOUNT_NUMBER = "0123456789"; 
+const ACCOUNT_NAME = "CONG TY ABC";
+const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NUMBER}-compact2.png?amount=${totalAmount}&addInfo=PAY-${invoiceId}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
     if (!invoiceId) {
         navigate('/');
         return null; 
     }
 
-    // Xử lý khi nhấn "Tôi đã thanh toán"
     const handleConfirmPayment = async () => {
         setLoading(true);
 
-        // Chuẩn bị body cho API thanh toán
-        //
-        const paymentData = {
-            amount: totalAmount,
-            state: "SUCCESS", // Giả lập thanh toán thành công
-            method: "FAKE_PAYMENT_BUTTON",
-        };
-
         try {
-            // Gọi API công khai: POST /api/bookings/{invoiceId}/pay
-            //
-            await executePayment(invoiceId, paymentData);
 
-            alert("Xác nhận thanh toán thành công! Booking của bạn đã được xác nhận.");
-            navigate('/tours'); // Chuyển đến trang lịch sử đặt tour
+            alert("Đang xác nhận thanh toán... vui lòng chờ. Thông tin thanh toán sẽ được gửi qua email.");
+           console.log()
+            navigate('/tours'); 
 
         } catch (err) {
             console.error(err);
@@ -51,7 +42,6 @@ export default function PaymentPage() {
     };
 
     const handleCancel = async () => {
-        // Hỏi xác nhận
         if (!window.confirm("Bạn có chắc muốn hủy booking này? (Chỉ có thể hủy khi chưa thanh toán)")) {
             return;
         }
@@ -59,18 +49,15 @@ export default function PaymentPage() {
         setLoading(true);
 
         try {
-            // 3. GỌI API HỦY TOUR
-            //
+
             const response = await cancelBooking(invoiceId); 
             
             console.log("Hủy thành công, booking đã chuyển sang:", response.status);
             alert("Đã hủy booking thành công.");
-            navigate('/'); // Quay về trang chủ
+            navigate('/');
 
         } catch (err) {
             console.error(err);
-            // Hiển thị lỗi từ BE (ví dụ: "Booking này không thể hủy...")
-            //
             alert(`Hủy thất bại: ${err.message}`); 
         } finally {
             setLoading(false);
@@ -85,12 +72,12 @@ export default function PaymentPage() {
             <div className="max-w-2xl mx-auto py-12 px-4 text-center">
                 
                 <h2 className="text-2xl font-bold mb-4">Hoàn tất Thanh toán</h2>
-                <p className="text-lg mb-4">Vui lòng quét mã QR bên dưới để thanh toán (Giả lập)</p>
+                <p className="text-lg mb-4">Vui lòng quét mã QR bên dưới để thanh toán</p>
                 
                 <div className="bg-white p-6 rounded-lg shadow-lg">
-                    {/* <img src={FakeQrImage} alt="Fake QR Code" className="mx-auto" /> */}
+                    
                     <div className="w-48 h-48 bg-gray-200 mx-auto flex items-center justify-center">
-                        (Ảnh QR Giả)
+                        <img src={qrUrl} alt="QR VietQR" className="mx-auto w-64 shadow-lg rounded-md" />
                     </div>
 
                     <p className="text-xl font-semibold mt-4">Tổng số tiền:</p>

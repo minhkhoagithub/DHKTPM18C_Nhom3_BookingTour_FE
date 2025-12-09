@@ -4,8 +4,10 @@ import React, {useEffect, useState} from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import TopBanner from '../components/TopBanner';
 import { createBooking } from '../services/bookingService';
+import { getCurrentUser, getUserInfo } from '../services/authService';
 const GENDER_OPTIONS = ["MALE", "FEMALE", "OTHER"]; //
 const PASSENGER_TYPES = ["ADL", "CHD", "INF"];
+
 export default function BookingPage() {
     const [searchParams] = useSearchParams();
 const navigate = useNavigate();
@@ -17,8 +19,31 @@ const navigate = useNavigate();
     const [contactPhone, setContactPhone] = useState('');
     const [passengers, setPassengers] = useState([]);
 
-    const [loading, setLoading] = useState(false);
+const [currentUser, setCurrentUser] = useState(null);
+const[customerId,setCustomerId]=useState(null);
 
+useEffect(() => {
+  async function fetchUser() {
+    const user = await getCurrentUser();
+    console.log(">>> Current User:", user);
+    setCurrentUser(user);
+
+    // Auto fill nếu user đang đăng nhập
+    if (user) {
+      if (user.email) setContactEmail(user.email);
+      if (user.phone) setContactPhone(user.phone);
+    }
+  }
+  fetchUser();
+}, []);
+
+useEffect(() => {
+    if (currentUser && currentUser.customerId) {
+        setCustomerId(currentUser.customerId);
+        console.log("customerId:", currentUser.customerId);
+    }
+}, [currentUser]);
+    
     useEffect(() => {
         const initialPassengers = Array.from({ length: guests }, () => ({
             fullName: '',
@@ -49,7 +74,6 @@ const navigate = useNavigate();
     };
     const handleSubmitBooking = async (e) => {
         e.preventDefault();
-        setLoading(true);
 
         // TODO: Thêm validation (kiểm tra email, sđt, tên...)
         if (!contactEmail || !contactPhone) {
@@ -59,9 +83,9 @@ const navigate = useNavigate();
         }
         const bookingData = {
             departureId: departureId,
+            customerId: customerId,
             contactEmail: contactEmail,
             contactPhone: contactPhone,
-            promotionRef: null, 
             passengers: passengers 
         };
         console.log("Chuẩn bị gửi booking với dữ liệu:", bookingData);
@@ -88,9 +112,7 @@ const navigate = useNavigate();
         } catch (err) {
             console.error(err);
             alert(`Đặt tour thất bại: ${err.message}`);
-        } finally {
-            setLoading(false);
-        }
+        } 
     };
 
 

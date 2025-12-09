@@ -38,7 +38,7 @@ export default function ToursList() {
                             <div key={index} className='overflow-hidden border shadow-lg shadow-gray-500 rounded-lg'>
                                 <div className=''>
                                     <img 
-                                    src={destination.img} 
+                                    src={destination.images[0]} 
                                     alt={destination.name} 
                                     width={600} 
                                     height={400}

@@ -85,7 +85,9 @@ export const executePayment = async (invoiceId, paymentData) => {
             `http://localhost:8080/api/bookings/${invoiceId}/pay`, 
             paymentData
         );
-        return response.data; // Trả về PaymentResponseDTO
+        console.log("Payment response:", response);
+        return response.data; 
+        
     } catch (error) {
         // ... (xử lý lỗi)
     }

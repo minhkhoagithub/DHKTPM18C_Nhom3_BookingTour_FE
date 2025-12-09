@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import TopBanner from '../../components/TopBanner';
 import {  getTourById } from '../../services/tourService';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getUserInfo } from '../../services/authService';
 
 export default function TourDetail() {
 
@@ -60,6 +61,9 @@ export default function TourDetail() {
             alert("Số lượng khách phải ít nhất là 1.");
             return;
         }
+        ;
+
+        
         navigate(`/booking?tourId=${tourId}&departureId=${selectedDepartureId}&guests=${guestCount}`);
     };
 if (loading) {
@@ -87,7 +91,7 @@ if (loading) {
     return (
         <>
             <div className="h-[400px] relative -mt-12">
-                <img src={'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'} alt={tour.name} className="w-full h-full object-cover" />
+                <img src={tour.images[0]} alt={tour.name} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black opacity-50"></div>
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
                     <h1 className="text-white text-5xl font-bold font-serif">{tour.name}</h1>
@@ -135,6 +139,7 @@ if (loading) {
                                                     {new Date(dep.startDate).toLocaleDateString("vi-VN")} →{" "}
                                                     {new Date(dep.endDate).toLocaleDateString("vi-VN")}  
                                                     ({dep.status})
+                                                    ({dep.availableSlots} chỗ trống)
                                                 </option>
                                             ))}
                                         </select>
