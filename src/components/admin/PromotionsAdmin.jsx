@@ -107,15 +107,58 @@ const PromotionsAdmin = () => {
                 </button>
             </div>
             
-            {/* Search and Filters */}
-            <div className="mb-4">
-                 <div className="relative">
+            {/* Search and Filters Container: Use flex to put Search and Filters in one row */}
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+                
+                {/* 1. Search Bar */}
+                <div className="relative flex-shrink-0">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                     <input 
                         type="text" 
-                        placeholder="Search by name or status..." 
+                        placeholder="Search by name..." 
                         className="pl-10 pr-4 py-2 w-full max-w-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500"
                     />
+                </div>
+
+                {/* 2. Filter Section */}
+                <div className="flex flex-wrap items-center gap-4">
+                    <span className="text-sm font-medium text-gray-700 flex-shrink-0">Filter By:</span>
+
+                    {/* Filter theo Status */}
+                    <select 
+                        // value={filterStatus} 
+                        // onChange={(e) => setFilterStatus(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    >
+                        <option value="">All Statuses</option>
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="INACTIVE">INACTIVE</option>
+                        <option value="SCHEDULED">SCHEDULED</option>
+                        <option value="EXPIRED">EXPIRED</option>
+                    </select>
+                    
+                    {/* Filter theo Scope */}
+                    <select 
+                        // value={filterScope} 
+                        // onChange={(e) => setFilterScope(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    >
+                        <option value="">All Scopes</option>
+                        <option value="GLOBAL">Global</option>
+                        <option value="SPECIFIC_TOUR">Specific Tour</option>
+                    </select>
+
+                    {/* Filter theo Type */}
+                    <select 
+                        // value={filterType} 
+                        // onChange={(e) => setFilterType(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    >
+                        <option value="">All Types</option>
+                        <option value="PERCENT">PERCENT</option>
+                        <option value="FIXED">FIXED</option>
+                        {/* ... thêm các type khác ... */}
+                    </select>
                 </div>
             </div>
 
