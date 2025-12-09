@@ -45,9 +45,9 @@ export default function AdminLayout () {
             name: 'Tài chính',
             items: [
                 { name: 'Promotions', icon: <Tag size={20} />, path: '/admin/promotions' },
-                { name: 'Payments', icon: <CreditCard size={20} />, path: '/admin/payments' },
-                { name: 'Invoices', icon: <FileText size={20} />, path: '/admin/invoices' },
-                { name: 'Price Policies', icon: <DollarSign size={20} />, path: '/admin/price-policies' },
+                // { name: 'Payments', icon: <CreditCard size={20} />, path: '/admin/payments' },
+                // { name: 'Invoices', icon: <FileText size={20} />, path: '/admin/invoices' },
+                // { name: 'Price Policies', icon: <DollarSign size={20} />, path: '/admin/price-policies' },
             ]
         },
         {
