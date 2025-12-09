@@ -15,7 +15,7 @@ export default function PaymentPage() {
     const BANK_ID = "VCB"; 
 
 
-    const { invoiceId, totalAmount } = location.state || {};
+    const { invoiceId, totalAmount,promotionRef, discount } = location.state || {};
 const ACCOUNT_NUMBER = "0123456789"; 
 const ACCOUNT_NAME = "CONG TY ABC";
 const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NUMBER}-compact2.png?amount=${totalAmount}&addInfo=PAY-${invoiceId}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
@@ -85,6 +85,17 @@ const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NUMBER}-compact2
                         {new Intl.NumberFormat('vi-VN').format(totalAmount)} VND
                     </p>
                     <p className="text-gray-500 mt-2">Mã hóa đơn: {invoiceId}</p>
+                   {promotionRef && (
+    <p className="text-blue-600 font-semibold mt-2">
+        Khuyến mãi áp dụng: {promotionRef}
+    </p>
+)}
+
+{discount > 0 && (
+    <p className="text-green-600 font-semibold mt-1">
+        Giảm giá: -{discountAmount.toLocaleString("vi-VN")} VND
+    </p>
+)}
 
                     <button 
                         onClick={handleConfirmPayment}

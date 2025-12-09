@@ -96,21 +96,23 @@ const settings = {
                                 <div>
                                     <div key={destination.tourId} className='overflow-hidden border shadow-lg shadow-gray-500 rounded-lg mb-5 mr-5'>
                                         <div className=''>
-                                            {/* <img 
-                                            src={destination.img} 
+                                             <img 
+                                            src={destination.images[0]} 
                                             alt={destination.name} 
                                             width={600} 
                                             height={400}
                                             className='object-cover w-full h-48 hover:scale-110 transition-all'
-                                            /> */}                                          
+                                            />                                         
                                             <div className='p-4'>
                                                 <p className='text-gray-500 flex items-center gap-1 text-sm mb-1'><Clock width={15}/>{destination.durationText}</p>
                                                 <h3 className='text-xl font-bold mb-2'>{destination.name}</h3>
                                                 <p className='text-gray-600 mb-4 mt-2'>{destination.description}</p>
                                                 <div className='flex gap-4'>
-                                                    <button className='px-3 py-2 bg-red-500 rounded-md text-white'>${destination.basePrice}</button>
+                                                    <h3 className="text-2xl font-bold text-red-500 mb-4">
+                                {destination.basePrice.toLocaleString('vi-VN')}₫
+                            </h3>
                                                     <Link to={`/tour/${destination.tourId}`}>
-                                                    <button className='px-3 py-2 bg-black rounded-md text-white'>Learn More</button>
+                                                    <button className='px-3 py-2 bg-blue-500 rounded-md text-white'>Xem</button>
                                                     </Link>
                                                 </div>
                                             </div>
