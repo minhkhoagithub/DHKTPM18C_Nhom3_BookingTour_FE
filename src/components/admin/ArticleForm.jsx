@@ -1,11 +1,25 @@
-import React, { useState } from "react";
-import { createGlobalPost, updatePost } from "../../services/postService";
+import React, { useState, useEffect } from "react";
+import { createGlobalPost, updatePost, createPostForTour } from "../../services/postService";
+import { getAllTours } from "../../services/tourService";
 
 const ArticleForm = ({ close, reload, editing }) => {
   const [title, setTitle] = useState(editing?.title || "");
   const [thumbnailUrl, setThumbnailUrl] = useState(editing?.thumbnailUrl || "");
   const [content, setContent] = useState(editing?.content || "");
   const [status, setStatus] = useState(editing?.status || "PUBLISHED");
+    // NEW — Chọn Tour
+  const [tourId, setTourId] = useState(editing?.tourId || "GLOBAL");
+  const [tours, setTours] = useState([]);
+
+
+    // Load danh sách tour
+  useEffect(() => {
+    const fetchTours = async () => {
+      const data = await getAllTours();
+      setTours(data);
+    };
+    fetchTours();
+  }, []);
 
   // ======================
   // UPLOAD IMAGE TO CLOUDINARY
@@ -31,28 +45,41 @@ const ArticleForm = ({ close, reload, editing }) => {
     return "";
   };
 
-  // ======================
-  // SUBMIT FORM
-  // ======================
-  const handleSubmit = async () => {
-    const postData = { title, thumbnailUrl, content, status };
 
-    try {
-      if (editing) {
-        await updatePost(editing.postId, postData);
-      } else {
+  // SUBMIT
+const handleSubmit = async () => {
+  const postData = { title, thumbnailUrl, content, status };
+
+  try {
+    if (editing) {
+      // Update bài viết + gửi tourId
+      await updatePost(
+        editing.postId,
+        postData,
+        tourId === "GLOBAL" ? null : tourId
+      );
+
+    } else {
+      // Tạo mới
+      if (tourId === "GLOBAL") {
         await createGlobalPost(postData);
+      } else {
+        await createPostForTour(tourId, postData);
       }
-      reload();
-      close();
-    } catch (err) {
-      console.error("Error saving post:", err);
     }
-  };
+
+    reload();
+    close();
+  } catch (err) {
+    console.error("Error saving post:", err);
+  }
+};
+
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
-      <div className="bg-white p-6 rounded-lg w-full max-w-lg shadow-lg">
+   <div className="fixed inset-0 bg-black/40 flex justify-center items-center overflow-y-auto p-6">
+       <div className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-lg max-h-[80vh] overflow-y-auto">
+
         <h2 className="text-xl font-bold mb-4">
           {editing ? "Chỉnh sửa bài viết" : "Tạo bài viết mới"}
         </h2>
@@ -64,6 +91,21 @@ const ArticleForm = ({ close, reload, editing }) => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
+  {/* TOUR SELECT */}
+        <label className="block mb-1">Thuộc Tour</label>
+        <select
+          className="border px-3 py-2 rounded w-full mb-3"
+          value={tourId}
+          onChange={(e) => setTourId(e.target.value)}
+        >
+          <option value="GLOBAL">GLOBAL — Bài viết toàn cục</option>
+
+          {tours.map((t) => (
+            <option key={t.tourId} value={t.tourId}>
+              {t.name}
+            </option>
+          ))}
+        </select>
 
         {/* THUMBNAIL */}
         <label className="block mb-2">Thumbnail</label>

@@ -41,13 +41,17 @@ export const createGlobalPost = async (postData) => {
     throw error;
   }
 };
-
-/**
- * Cập nhật bài viết
- */
-export const updatePost = async (postId, postData) => {
+export const updatePost = async (postId, postData, tourId) => {
   try {
-    const response = await fetch(`${API_POST_BASE}/update?postId=${postId}`, {
+    // Tạo URL động
+    let url = `${API_POST_BASE}/update?postId=${postId}`;
+    
+    if (tourId) {
+      url += `&tourId=${tourId}`;
+    }
+    // Nếu GLOBAL -> KHÔNG gửi tourId
+
+    const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(postData),
@@ -96,7 +100,7 @@ export const getPostsByTour = async (tourId) => {
  //get post ID
   export async function getPostById(postId) {
   try {
-    const res = await fetch(`http://localhost:8080/post/${postId}`);
+    const res = await fetch(`http://localhost:8080/post/detail/${postId}`);
     if (!res.ok) {
       throw new Error("Failed to fetch post detail");
     }
@@ -106,6 +110,7 @@ export const getPostsByTour = async (tourId) => {
     throw err;
   }
 }
+
 export const getAllPostsAdmin = async () => {
   try {
     const response = await fetch("http://localhost:8080/post/admin/get-all-post");
