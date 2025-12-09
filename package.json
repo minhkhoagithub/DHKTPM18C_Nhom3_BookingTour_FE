@@ -12,7 +12,7 @@
   "dependencies": {
     "@stomp/stompjs": "^7.2.1",
     "@tailwindcss/vite": "^4.1.12",
-    "jwt-decode": "^4.0.0",
+    "axios": "^1.13.2",
     "lightgallery": "^2.9.0-beta.1",
     "lucide-react": "^0.542.0",
     "react": "^19.1.1",
