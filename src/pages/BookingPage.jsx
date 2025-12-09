@@ -94,7 +94,7 @@ export default function BookingPage() {
       const response = await createBooking(bookingData);
       console.log("Booking thành công:", response);
       alert("Đặt tour thành công!");
-      const { invoiceId, totalPrice } = response;
+      const { invoiceId, totalPrice,discountAmount,promotionRef } = response;
 
       if (!invoiceId) {
         console.error(
@@ -108,6 +108,9 @@ export default function BookingPage() {
         state: {
           invoiceId: invoiceId,
           totalAmount: totalPrice,
+          discount: discountAmount,
+          promotionRef: promotionRef
+
         },
       });
     } catch (err) {

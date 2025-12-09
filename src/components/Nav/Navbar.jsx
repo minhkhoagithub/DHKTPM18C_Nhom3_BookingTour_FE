@@ -224,9 +224,7 @@ export default function Navbar() {
                         Login
                       </button>
                     </Link>
-                    <button className="bg-white text-black px-5 py-2 rounded-full font-bold hover:bg-gray-100 transition-all hover:shadow-lg transform hover:-translate-y-0.5">
-                      Book Now
-                    </button>
+                    
                   </>
                 )}
               </div>
