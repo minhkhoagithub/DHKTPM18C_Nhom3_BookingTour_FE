@@ -45,12 +45,11 @@ export default function ToursList() {
                                     className='object-cover w-full h-48 hover:scale-110 transition-all'
                                     />
                                     <div className='p-4'>
-                                        <p className='text-gray-500 flex items-center gap-1 text-sm mb-1'><Clock width={15}/>{destination.time}</p>
+                                        <p className='text-gray-500 flex items-center gap-1 text-sm mb-1'><Clock width={15}/>{destination.durationText}</p>
                                         <h3 className='text-xl font-bold mb-2'>{destination.name}</h3>
-                                        <p className='flex gap-1 items-center'><Star width={20} fill='red'/>{destination.star}</p>
-                                        <p className='text-gray-600 mb-4 mt-2'>Experience the beauty and culture of {destination.name}</p>
+                                        <p className='text-gray-600 mb-4 mt-2'>{destination.description}</p>
                                         <div className='flex gap-4'>
-                                            <button className='px-3 py-2 bg-red-500 rounded-md text-white'>${destination.price}</button>
+                                            <button className='px-3 py-2 bg-red-500 rounded-md text-white'>${destination.basePrice}</button>
                                             <Link to={`/tour/${destination.tourId}`}>
                                                 <button className='px-3 py-2 bg-black rounded-md text-white'>Learn More</button>
                                             </Link>

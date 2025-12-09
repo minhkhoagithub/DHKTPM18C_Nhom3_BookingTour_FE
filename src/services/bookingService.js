@@ -1,26 +1,58 @@
-const bookingData = {
-  departureId: "d0000000-0000-0000-0000-000000000309",
-  contactEmail: "tai_khoan_vang_lai@gmail.com",
-  contactPhone: "0900112233",
-  promotionRef: null,
-  passengers: [
-    {
-      fullName: "Khách Vãng Lai (ADL)",
-      type: "ADL",
-      birthDate: "1990-01-15",
-      gender: "MALE",
-      roomSingle: false
-    },
-    {
-      fullName: "Hành Khách 2",
-      type: "ADL",
-      birthDate: "1995-05-20",
-      gender: "FEMALE",
-      roomSingle: false
+
+const API_URL = "http://localhost:8080/api/admin/bookings";
+
+/**
+ * Lấy tất cả booking
+ */
+export const getAllBookings = async () => {
+    try {
+        const response = await fetch(API_URL, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                
+            },
+        });
+
+        if (!response.ok) throw new Error(`Failed to fetch bookings: ${response.status}`);
+
+        const result = await response.json();
+
+        if (!result.success) throw new Error(result.message || "Failed to fetch bookings");
+
+        return result.data; 
+    } catch (error) {
+        console.error("Failed to fetch all bookings:", error);
+        throw error;
     }
-  ]
 };
 
+/**
+ * Lấy chi tiết một booking theo ID
+ * @param {string} id UUID của booking
+ */
+export const getBookingById = async (id) => {
+    try {
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                // "Authorization": `Bearer ${yourToken}`
+            },
+        });
+
+        if (!response.ok) throw new Error(`Failed to fetch booking ${id}: ${response.status}`);
+
+        const result = await response.json();
+
+        if (!result.success) throw new Error(result.message || `Failed to fetch booking ${id}`);
+
+        return result.data; 
+    } catch (error) {
+        console.error(`Failed to fetch booking ${id}:`, error);
+        throw error;
+    }
+};
 
 
 export const createBooking = async (bookingData) => {

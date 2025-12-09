@@ -14,6 +14,7 @@ export default function ToursAdmin() {
     const fetchTours = async () => {
         try {
             const data = await getAllTours();
+            
             setTours(data);
         } catch (error) {
             console.error("Failed to fetch tours for admin:", error);
@@ -35,18 +36,21 @@ export default function ToursAdmin() {
             console.error("Failed to add tour:", error);
         }
     };
-    const handleUpdateTour = async (originalName, updatedTourData) => {
+
+
+     const handleUpdateTour = async (id, updatedTourData) => {
         try {
-            await updateTour(originalName, updatedTourData);
+            await updateTour(id, updatedTourData);
             await fetchTours();
         } catch (error) {
             console.error("Failed to update tour:", error);
         }
     };
-    const handleDeleteTour = async (name) => {
-        if (window.confirm(`Bạn có chắc muốn xóa tour: ${name}?`)) {
+
+    const handleDeleteTour = async (id) => {
+        if (window.confirm(`Bạn có chắc muốn xóa tour: ${id}?`)) {
             try {
-                await deleteTour(name);
+                await deleteTour(id);
                 await fetchTours(); 
             } catch (error) {
                 console.error("Failed to delete tour:", error);
@@ -92,12 +96,14 @@ export default function ToursAdmin() {
                     </tr>
                 </thead>
                 <tbody>
-                    {tours.map((tour, index) => (
+                    {tours.map((tour, index) => { 
+                        return (
+                        
                         <tr key={index} className="bg-white border-b hover:bg-gray-50">
                             {/* <td className="px-6 py-4 font-medium text-gray-900">{tour.id}</td> */}
                             <td className="px-6 py-4">{tour.name}</td>
-                            <td className="px-6 py-4">{tour.time}</td>
-                            <td className="px-6 py-4">{tour.price}</td>
+                            <td className="px-6 py-4">{tour.durationText}</td>
+                            <td className="px-6 py-4">{tour.basePrice}</td>
                             {/* <td className="px-6 py-4">
                                 <span className={`px-2 py-1 text-xs font-medium rounded-full ${tour.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
                                     {tour.status}
@@ -111,14 +117,14 @@ export default function ToursAdmin() {
                                     <Edit size={18} />
                                 </button>
                                 <button 
-                                    onClick={() => handleDeleteTour(tour.name)}
+                                    onClick={() => handleDeleteTour(tour.tourId)}
                                     className="text-red-600 hover:text-red-800"
                                 >
                                     <Trash2 size={18} />
                                 </button>
                             </td>
                         </tr>
-                    ))}
+                    )})}
                 </tbody>
             </table>
         </div>

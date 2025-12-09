@@ -1,60 +1,139 @@
+const API_URL = "http://localhost:8080/api/auth";
 
+/**
+ * LOGIN WITH EMAIL + PASSWORD
+ */
+export async function login(email, password) {
+  try {
+    // Xoá toàn bộ localStorage trước khi login mới
+    localStorage.clear();
+    console.log("✓ Đã xoá toàn bộ localStorage cũ");
 
-// Lấy API_BASE_URL (Giả sử bạn định nghĩa nó ở một nơi)
-const API_BASE_URL = 'http://localhost:8080/api'; 
+    const response = await fetch(`${API_URL}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
 
-// Hàm xử lý response chuẩn (copy từ tourService.js)
-const handleResponse = async (response) => {
+    const data = await response.json();
+
+    console.log("Login response từ BE:", data);
+
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      throw new Error(data.message || "Sai email hoặc mật khẩu");
     }
-    const apiResponse = await response.json();
-    if (apiResponse.success) {
-        return apiResponse.data; // Chỉ trả về phần data
-    } else {
-        throw new Error(apiResponse.message || 'API call was not successful');
-    }
-};
+
+    // Lưu token
+    localStorage.setItem("token", data.data);
+    console.log("✓ Token đã lưu:", data.data);
+
+    return data.data;
+  } catch (error) {
+    console.error("❌ Login error:", error);
+    throw error;
+  }
+}
 
 /**
- * Gọi API login từ AuthController.java
- * @param {string} email
- * @param {string} password
+ * LOGIN WITH GOOGLE
  */
-export const login = async (email, password) => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-        });
+export async function loginWithGoogle(idToken) {
+  try {
+    // Xoá toàn bộ localStorage trước khi login mới
+    localStorage.clear();
+    console.log("✓ Đã xoá toàn bộ localStorage cũ");
 
-        const data = await handleResponse(response); 
+    const response = await fetch(`${API_URL}/google`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken })
+    });
 
-        if (data.token) {
+    const data = await response.json();
 
-            localStorage.setItem('jwt_token', data.token); 
-            
-            localStorage.setItem('user_email', data.email);
-        }
-        
-        return data;
+    console.log("Google login response từ BE:", data);
 
-    } catch (error) {
-        console.error('Login failed:', error);
-        throw error;
+    if (!response.ok) {
+      throw new Error(data.message || "Google login thất bại");
     }
-};
+
+    // Lưu token
+    localStorage.setItem("token", data.data);
+    console.log("✓ Token từ Google đã lưu:", data.data);
+
+    return data.data;
+  } catch (error) {
+    console.error("❌ Google login error:", error);
+    throw error;
+  }
+}
 
 /**
- * Xóa token khi logout
+ * LOGOUT
  */
-export const logout = () => {
-    localStorage.removeItem('jwt_token');
-    localStorage.removeItem('user_email');
-    // Chuyển hướng về trang chủ
-    window.location.href = '/'; 
-};
+export function logout() {
+  localStorage.clear();
+  console.log("✓ Đã xoá toàn bộ localStorage");
+}
+
+/**
+ * LẤY TOKEN HIỆN TẠI
+ */
+export function getToken() {
+  const token = localStorage.getItem("token");
+  console.log("🔑 Token hiện tại:", token ? "Có token" : "Không có token");
+  return token;
+}
+
+/**
+ * LƯU USER INFO
+ */
+export function setUserInfo(userInfo) {
+  if (userInfo) {
+    localStorage.setItem("userInfo", JSON.stringify(userInfo));
+    console.log("✓ User info đã lưu:", userInfo);
+  } else {
+    console.warn("⚠️ Không có user info để lưu");
+  }
+}
+
+/**
+ * LẤY USER INFO
+ */
+export function getUserInfo() {
+  const userInfo = localStorage.getItem("userInfo");
+  const result = userInfo ? JSON.parse(userInfo) : null;
+  console.log("📋 User info từ localStorage:", result);
+  return result;
+}
+
+/**
+ * GỬI REQUEST CÓ KÈM BEARER TOKEN (dùng cho API cần đăng nhập)
+ */
+export async function authFetch(url, options = {}) {
+  const token = getToken();
+
+  const headers = {
+    ...options.headers,
+    Authorization: token ? `Bearer ${token}` : "",
+    "Content-Type": "application/json"
+  };
+
+  const response = await fetch(url, {
+    ...options,
+    headers
+  });
+
+  return response.json();
+}
+
+export async function getCurrentUser() {
+  const token = getToken();
+  if (!token) return null;
+
+  const response = await authFetch(`${API_URL}/me`);
+
+  // BE trả về ApiResponse → data nằm trong response.data
+  return response.data || null;
+}
+
