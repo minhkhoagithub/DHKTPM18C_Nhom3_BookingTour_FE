@@ -65,79 +65,122 @@ export const getTourById = async (id) => {
     }
 };
 
+
+
+
+// Xử lý trước khi thêm tour mới
+// Upload Ảnh lên Cloudinary (Tạo Mảng Link)
+   export const uploadImages = async (files) => {
+  const CLOUD_NAME = "dzwn8lpqf";
+  const PRESET_NAME = "ml_default"; // kiểm tra tên preset
+  const FOLDER = "tours";
+
+  const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+
+  const uploadPromises = [...files].map(async (file) => {
+    const formData = new FormData();
+    formData.append("file", file); // bắt buộc là dạng File/Blob
+    formData.append("upload_preset", PRESET_NAME);
+    formData.append("folder", FOLDER);
+
+    const res = await fetch(uploadUrl, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      console.error("Cloudinary error:", err);
+      throw new Error(`Failed to upload: ${file.name}`);
+    }
+
+    const data = await res.json();
+    return data.secure_url;
+  });
+
+  return Promise.all(uploadPromises);
+};
+
+
 /**
  * THÊM MỘT TOUR MỚI (Mô phỏng POST)
  * @param {object} newTour Dữ liệu tour mới từ form
  */
 export const addTour = async (newTour) => {
-    /* --- CODE API THẬT ---
+    // --- CODE API THẬT ---
     if (!API_BASE_URL) throw new Error("API base URL is not configured");
+
+    // 1. Lấy mảng URL từ Cloudinary
+    console.log("Images received:", newTour.images);
+    const imageUrls = await uploadImages(newTour.images);
     
-    // API thật sẽ cần xử lý 'FormData' nếu bạn upload file
-    // const formData = new FormData();
-    // formData.append('name', newTour.name);
-    // ... (thêm các trường khác)
-    // formData.append('imageFile', newTour.imageFile); // Giả sử newTour có imageFile
+    //  xử lý 'FormData' để upload file
+    const formData = new FormData();
+    formData.append("name", newTour.name);
+    formData.append("description", newTour.description);
+    formData.append("location", newTour.location);
+    formData.append("basePrice", newTour.basePrice);
+    formData.append("durationDays", newTour.durationDays);
+    formData.append("durationText", newTour.durationText);
+    formData.append("type", newTour.type);
+    formData.append("status", newTour.status);
+    imageUrls.forEach(url =>  formData.append("images", url))
     
-    const response = await fetch(`${API_BASE_URL}/tours`, {
+    const response = await fetch(`${API_BASE_URL}`, {
         method: 'POST',
-        // headers: { 'Content-Type': 'application/json' }, // Bỏ header này khi dùng FormData
-        // body: JSON.stringify(newTour), // Dùng body này nếu chỉ gửi JSON (không có file)
-        body: formData
+        headers: { 'Content-Type': 'application/json' }, // Bỏ header này khi dùng FormData
+         body: JSON.stringify({
+        ...newTour,
+        images: imageUrls
+    }) // Dùng body này nếu chỉ gửi JSON (không có file)
+        // body: formData
     });
     if (!response.ok) throw new Error('Failed to add tour');
     return await response.json();
-    */
-   
-    // --- CODE GIẢ LẬP ---
-    console.log("Mock API called: addTour", newTour);
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            // Thêm tour mới vào đầu mảng
-            mockTourDatabase.unshift(newTour);
-            resolve(newTour); // Trả về tour vừa được thêm
-        }, 500);
-    });
+
 };
 
 /**
  * CẬP NHẬT MỘT TOUR (Mô phỏng PUT/PATCH)
- * @param {string} originalName Tên gốc của tour để tìm
+ *  @param {string} id id để update
  * @param {object} updatedTourData Dữ liệu tour đã cập nhật
  */
-export const updateTour = async (originalName, updatedTourData) => {
-    /* --- CODE API THẬT (PUT) ---
-    if (!API_BASE_URL) throw new Error("API base URL is not configured");
-    const response = await fetch(`${API_BASE_URL}/tours/${originalName}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedTourData),
-    });
-    if (!response.ok) throw new Error('Failed to update tour');
-    return await response.json();
-    */
-   
-    // --- CODE GIẢ LẬP ---
-    console.log(`Mock API called: updateTour(${originalName})`, updatedTourData);
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const index = mockTourDatabase.findIndex(t => t.name === originalName);
-            if (index !== -1) {
-                // Hợp nhất dữ liệu cũ với dữ liệu mới
-                mockTourDatabase[index] = { ...mockTourDatabase[index], ...updatedTourData };
-                resolve(mockTourDatabase[index]);
-            } else {
-                reject(new Error('Tour not found for update'));
-            }
-        }, 500);
-    });
+export const updateTour = async (id, updatedTourData) => {
+  if (!API_BASE_URL) throw new Error("API base URL is not configured");
+
+  // 1. Upload ảnh mới (nếu có)
+  let newImageUrls = [];
+  if (updatedTourData.newImageFiles && updatedTourData.newImageFiles.length > 0) {
+    newImageUrls = await uploadImages(updatedTourData.newImageFiles);
+  }
+
+  // 2. Gộp ảnh cũ + ảnh mới
+  const finalImages = [
+    ...(updatedTourData.images || []), 
+    ...newImageUrls
+  ];
+
+  // 3. Gửi PUT lên server
+  const response = await fetch(`${API_BASE_URL}/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ...updatedTourData,
+      images: finalImages,
+    })
+  });
+
+  if (!response.ok) throw new Error("Failed to update tour");
+
+  return await response.json();
 };
+
 
 /**
  * XÓA MỘT TOUR (Mô phỏng DELETE)
  * @param {string} name Tên của tour cần xóa
  */
-const API_URL = "http://localhost:8080/api/admin/tours";
+const API_URL = "http://localhost:8080/api/tours";
 
 export const deleteTour = async (id) => {
   try {
