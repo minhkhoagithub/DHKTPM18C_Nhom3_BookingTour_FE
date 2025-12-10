@@ -1,23 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { getCurrentUser, logout } from "../services/authService";
+import { updateUser } from "../services/userService";
 import { useNavigate } from "react-router-dom";
 
 export default function AccountSettings() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // FORM EDIT INFO
   const [form, setForm] = useState({
     name: "",
     phone: "",
     address: "",
-  });
-
-  // FORM CHANGE PASSWORD
-  const [passwordForm, setPasswordForm] = useState({
-    oldPassword: "",
-    newPassword: "",
-    confirmPassword: "",
   });
 
   const navigate = useNavigate();
@@ -25,6 +18,7 @@ export default function AccountSettings() {
   useEffect(() => {
     const loadUser = async () => {
       const data = await getCurrentUser();
+
       if (!data) {
         navigate("/login");
         return;
@@ -43,33 +37,33 @@ export default function AccountSettings() {
     loadUser();
   }, []);
 
+  // ------------------ UPDATE INFO ------------------
   const handleUpdateInfo = async (e) => {
     e.preventDefault();
 
-    // TODO: Gọi API cập nhật user
-    console.log("📌 Updating info:", form);
-    alert("Cập nhật thông tin thành công");
+    try {
+      const payload = {
+        name: form.name,
+        email: user.email, // không cho sửa email
+        phone: form.phone,
+        address: form.address,
+        loyaltyTier: user.loyaltyTier, // giữ nguyên tier
+      };
 
-    setUser({ ...user, ...form });
-  };
+      const updated = await updateUser(user.customerId, payload);
 
-  const handleChangePassword = async (e) => {
-    e.preventDefault();
+      setUser((prev) => ({
+        ...prev,
+        name: updated.name,
+        phone: updated.phone,
+        address: updated.address,
+      }));
 
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert("Mật khẩu mới không khớp!");
-      return;
+      alert("Cập nhật thông tin thành công!");
+    } catch (err) {
+      console.error("❌ Update failed:", err);
+      alert("Cập nhật thất bại! Vui lòng thử lại.");
     }
-
-    // TODO: Gọi API đổi mật khẩu
-    console.log("📌 Change password:", passwordForm);
-    alert("Đổi mật khẩu thành công");
-
-    setPasswordForm({
-      oldPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
   };
 
   if (loading)
@@ -82,7 +76,7 @@ export default function AccountSettings() {
           Cài Đặt Tài Khoản
         </h1>
 
-        {/* ======================= THÔNG TIN HIỆN TẠI ======================= */}
+        {/* ================= THÔNG TIN TÀI KHOẢN ================= */}
         <section className="mb-10">
           <h2 className="text-xl font-bold mb-4">Thông Tin Tài Khoản</h2>
 
@@ -90,8 +84,11 @@ export default function AccountSettings() {
             <p>
               <strong>Email:</strong> {user.email}
             </p>
-            <p>
+            {/* <p>
               <strong>Loại tài khoản:</strong> {user.userType}
+            </p> */}
+            <p>
+              <strong>Hạng thành viên:</strong> {user.loyaltyTier || "GUEST"}
             </p>
             <p>
               <strong>Ngày tạo:</strong>{" "}
@@ -104,7 +101,7 @@ export default function AccountSettings() {
           </div>
         </section>
 
-        {/* ======================= CẬP NHẬT THÔNG TIN ======================= */}
+        {/* ================= CẬP NHẬT THÔNG TIN ================= */}
         <section className="mb-10">
           <h2 className="text-xl font-bold mb-4">Chỉnh Sửa Thông Tin</h2>
 
@@ -116,6 +113,7 @@ export default function AccountSettings() {
                 className="w-full p-3 border rounded"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
+                required
               />
             </div>
 
@@ -145,65 +143,7 @@ export default function AccountSettings() {
           </form>
         </section>
 
-        {/* ======================= ĐỔI MẬT KHẨU ======================= */}
-        <section className="mb-10">
-          <h2 className="text-xl font-bold mb-4">Đổi Mật Khẩu</h2>
-
-          <form onSubmit={handleChangePassword} className="space-y-5">
-            <div>
-              <label className="block mb-1 font-medium">Mật khẩu cũ</label>
-              <input
-                type="password"
-                className="w-full p-3 border rounded"
-                value={passwordForm.oldPassword}
-                onChange={(e) =>
-                  setPasswordForm({
-                    ...passwordForm,
-                    oldPassword: e.target.value,
-                  })
-                }
-              />
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium">Mật khẩu mới</label>
-              <input
-                type="password"
-                className="w-full p-3 border rounded"
-                value={passwordForm.newPassword}
-                onChange={(e) =>
-                  setPasswordForm({
-                    ...passwordForm,
-                    newPassword: e.target.value,
-                  })
-                }
-              />
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium">
-                Xác nhận mật khẩu
-              </label>
-              <input
-                type="password"
-                className="w-full p-3 border rounded"
-                value={passwordForm.confirmPassword}
-                onChange={(e) =>
-                  setPasswordForm({
-                    ...passwordForm,
-                    confirmPassword: e.target.value,
-                  })
-                }
-              />
-            </div>
-
-            <button className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
-              Đổi mật khẩu
-            </button>
-          </form>
-        </section>
-
-        {/* ======================= LOGOUT ======================= */}
+        {/* ================= LOGOUT ================= */}
         <div className="mt-10 flex justify-end">
           <button
             onClick={() => {
