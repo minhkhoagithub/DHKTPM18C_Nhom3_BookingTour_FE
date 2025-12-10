@@ -238,3 +238,33 @@ export const getTourByNameContains = async (searchName) => {
         throw error; 
     }
 };
+
+
+
+
+/**
+ * Lấy danh sách các địa điểm (location) duy nhất từ API.
+ */
+export const getUniqueTourLocations = async () => {
+    if (!API_BASE_URL) {
+        console.error("Vui lòng cung cấp API_BASE_URL trong tourService.js");
+        return [];
+    }
+
+    const url = `${API_BASE_URL}/locations`; // http://localhost:8080/api/tours/locations
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+        }
+        
+        const locations = await response.json();
+        // Backend trả về List<String> nên chúng ta chỉ cần trả về mảng đó
+        return locations; 
+        
+    } catch (error) {
+        console.error("Failed to fetch unique tour locations:", error);
+        return [];
+    }
+};
