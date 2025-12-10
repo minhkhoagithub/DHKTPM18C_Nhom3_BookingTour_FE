@@ -23,7 +23,12 @@ export const getAllDepartures = async () => {
     try {
         // Đường dẫn API giả định: http://localhost:8080/api/admin/tours/departures
         // Hoặc bạn có thể dùng 'http://localhost:8080/api/departures' nếu có endpoint riêng.
-        const response = await fetch(`${API_ADMIN_BASE_URL}/departures`);
+        const response = await fetch(`${API_ADMIN_BASE_URL}/departures`,{
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json",
+            },
+        });
         
         if (!response.ok) {
             throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
@@ -56,6 +61,7 @@ export const addDeparture = async (tourId, newDepartureData) => {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
             },
             body: JSON.stringify(newDepartureData),
         });
@@ -90,8 +96,8 @@ export const deleteDeparture = async (departureId) => {
         const response = await fetch(url, {
             method: 'DELETE',
             headers: { 
-                // Thêm Header Authorization nếu cần token
-                // 'Authorization': `Bearer ${token}` 
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json",
             },
         });
 
@@ -129,7 +135,7 @@ export const updateDeparture = async (departureId, updatedData) => {
             method: 'PUT',
             headers: { 
                 'Content-Type': 'application/json',
-                // Thêm Header Authorization nếu cần
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
             },
             body: JSON.stringify(updatedData),
         });

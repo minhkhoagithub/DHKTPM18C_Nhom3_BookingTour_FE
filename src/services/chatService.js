@@ -62,7 +62,12 @@ export async function sendMessage(sessionId, content) {
  */
 export async function getWaitingSessions() {
   try {
-    const response = await fetch(`${API}/staff/chat/sessions/waiting`);
+    const response = await fetch(`${API}/staff/chat/sessions/waiting`, {
+    headers: {
+      "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+  });
     const data = await response.json();
     console.log("✓ Waiting sessions loaded:", data);
     return data;
@@ -77,7 +82,12 @@ export async function getWaitingSessions() {
  */
 export async function getStaffSessions() {
   try {
-    const response = await fetch(`${API}/staff/chat/sessions/my`);
+    const response = await fetch(`${API}/staff/chat/sessions/my`,{
+      headers: {
+      "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    });
     const data = await response.json();
     console.log("✓ Staff sessions loaded:", data);
     return data;

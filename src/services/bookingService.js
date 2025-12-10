@@ -10,6 +10,7 @@ export const getAllBookings = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
                 
             },
         });
@@ -37,7 +38,7 @@ export const getBookingById = async (id) => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                // "Authorization": `Bearer ${yourToken}`
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
             },
         });
 
@@ -61,6 +62,7 @@ export const createBooking = async (bookingData) => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                // "Authorization": `Bearer ${localStorage.getItem("token")}`,
             },
             body: JSON.stringify(bookingData)
         });
