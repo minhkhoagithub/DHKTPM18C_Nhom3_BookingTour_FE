@@ -74,7 +74,7 @@ export default function Profile() {
 
           <div className="flex justify-between">
             <span className="font-semibold">Hạng thành viên:</span>
-            <span>{user.loyaltyTier || "Standard"}</span>
+            <span>{user.loyaltyTier || "GUEST"}</span>
           </div>
 
           <div className="flex justify-between">
