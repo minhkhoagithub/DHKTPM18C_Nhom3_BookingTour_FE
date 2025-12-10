@@ -1,6 +1,45 @@
 const API_URL = "http://localhost:8080/api/auth";
 
 /**
+ * REGISTER WITH EMAIL + PASSWORD + NAME
+ */
+export async function register(email, password, name) {
+  try {
+    // Xoá toàn bộ localStorage trước khi register mới
+    localStorage.clear();
+    console.log("✓ Đã xoá toàn bộ localStorage cũ");
+
+    const response = await fetch(`${API_URL}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, name })
+    });
+
+    const data = await response.json();
+
+    console.log("Register response từ BE:", data);
+
+    if (!response.ok) {
+      // Kiểm tra nếu là lỗi email đã tồn tại thì trả về thông báo tự nhiên hơn
+      let errorMessage = data.message || "Đăng ký thất bại";
+      if (data.message && data.message.includes("Email")) {
+        errorMessage = "Email đã tồn tại";
+      }
+      throw new Error(errorMessage);
+    }
+
+    // Lưu token
+    localStorage.setItem("token", data.data);
+    console.log("✓ Token đã lưu:", data.data);
+
+    return data.data;
+  } catch (error) {
+    console.error("❌ Register error:", error);
+    throw error;
+  }
+}
+
+/**
  * LOGIN WITH EMAIL + PASSWORD
  */
 export async function login(email, password) {
