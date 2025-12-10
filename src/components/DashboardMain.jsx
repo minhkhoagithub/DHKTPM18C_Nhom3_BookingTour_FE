@@ -6,10 +6,9 @@ import {
     getRevenueByMonth, 
     getRecentBookings, 
     downloadRevenueReport 
-} from '../api/adminDashboard'; 
+} from '../services/adminDashboard'; 
 
 export default function DashboardMain() {
-    // 1. Khởi tạo State
     const [summary, setSummary] = useState({
         totalRevenue: 0,
         totalBookings: 0,
@@ -23,7 +22,6 @@ export default function DashboardMain() {
     const [loading, setLoading] = useState(true);
     const [downloading, setDownloading] = useState(false); 
 
-    // 2. Các hàm tiện ích (Format tiền, tên tháng...)
     const formatCurrency = (value) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
     };
@@ -41,31 +39,24 @@ export default function DashboardMain() {
         };
         return styles[status] || "bg-gray-100 text-gray-800";
     };
-
-    // 3. Gọi API khi component load (useEffect)
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const currentYear = new Date().getFullYear();
 
-                // Gọi song song 3 API để tiết kiệm thời gian
                 const [summaryRes, revenueRes, recentRes] = await Promise.all([
                     getDashboardSummary(),
                     getRevenueByMonth(currentYear),
                     getRecentBookings()
                 ]);
-
-                // Hàm hỗ trợ lấy dữ liệu thật (xử lý trường hợp backend bọc trong biến data)
                 const getRealData = (res) => {
                     if (res && res.data) return res.data; 
                     return res;
                 };
 
-                // Xử lý Summary
                 const finalSummary = getRealData(summaryRes);
                 if (finalSummary) setSummary(finalSummary);
 
-                // Xử lý Revenue Chart
                 const revenueList = Array.isArray(getRealData(revenueRes)) ? getRealData(revenueRes) : [];
                 if (revenueList.length > 0) {
                     const fullMonths = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -79,7 +70,6 @@ export default function DashboardMain() {
                     setRevenueData(chartData);
                 }
 
-                // Xử lý Recent Bookings
                 const recentList = Array.isArray(getRealData(recentRes)) ? getRealData(recentRes) : [];
                 if (recentList.length > 0) {
                     setRecentBookings(recentList);
@@ -95,15 +85,12 @@ export default function DashboardMain() {
         fetchData();
     }, []);
 
-    // 4. Xử lý tải báo cáo PDF
     const handleDownloadReport = async () => {
         try {
             setDownloading(true);
             
-            // Gọi hàm từ file api, nhận về Blob
             const blobData = await downloadRevenueReport();
             
-            // Tạo link ảo để trình duyệt tải file về
             const url = window.URL.createObjectURL(blobData);
             const link = document.createElement('a');
             link.href = url;
@@ -111,7 +98,6 @@ export default function DashboardMain() {
             document.body.appendChild(link);
             link.click();
             
-            // Dọn dẹp
             link.parentNode.removeChild(link);
             window.URL.revokeObjectURL(url);
         } catch (error) {
@@ -122,7 +108,6 @@ export default function DashboardMain() {
         }
     };
 
-    // 5. Chuẩn bị dữ liệu hiển thị Card
     const statsCardsData = [
         { title: "Tổng Doanh Thu", value: formatCurrency(summary.totalRevenue || 0), desc: "Năm nay", icon: <DollarSign className="h-6 w-6 text-green-600" />, bg: "bg-green-50" },
         { title: "Tổng Booking", value: summary.totalBookings || 0, desc: "Đơn thành công", icon: <ShoppingCart className="h-6 w-6 text-blue-600" />, bg: "bg-blue-50" },
@@ -130,12 +115,10 @@ export default function DashboardMain() {
         { title: "Khách Hàng Mới", value: `+${summary.newCustomersThisMonth || 0}`, desc: "Trong tháng này", icon: <Users className="h-6 w-6 text-purple-600" />, bg: "bg-purple-50" },
     ];
 
-    // 6. Render giao diện
     if (loading) return <div className="flex justify-center h-screen items-center text-gray-500 font-medium">Đang tải dữ liệu...</div>;
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
-            {/* --- Phần 1: Cards Thống Kê --- */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
                 {statsCardsData.map((card, index) => (
                     <div key={index} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition-shadow">
@@ -160,10 +143,8 @@ export default function DashboardMain() {
                 ))}
             </div>
 
-            {/* --- Phần 2: Biểu đồ & Danh sách Booking --- */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
-                {/* Cột Trái: Biểu Đồ Doanh Thu */}
                 <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="text-lg font-bold text-gray-800">Biểu Đồ Doanh Thu ({new Date().getFullYear()})</h3>
@@ -205,7 +186,6 @@ export default function DashboardMain() {
                     </div>
                 </div>
 
-                {/* Cột Phải: Danh sách Booking mới nhất */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col h-full max-h-[466px]">
                     <h3 className="text-lg font-bold text-gray-800 mb-4">Booking Gần Đây</h3>
                     <div className="flex-1 overflow-auto pr-2 custom-scrollbar">
