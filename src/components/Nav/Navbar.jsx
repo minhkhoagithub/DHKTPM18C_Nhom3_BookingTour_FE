@@ -75,7 +75,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto py-2 px-5 flex bg-transparent justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
             <h1 className="text-2xl text-white font-bold tracking-wide">
-              Travel<span className="text-red-500">Steven</span>
+              Travel<span className="text-red-500">Seven</span>
             </h1>
           </Link>
 
