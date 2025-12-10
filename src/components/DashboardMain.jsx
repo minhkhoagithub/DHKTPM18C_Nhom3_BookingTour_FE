@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { DollarSign, Users, Package, ShoppingCart, Calendar, Download } from 'lucide-react';
-
-// Import các hàm gọi API từ file cấu hình fetch (axiosClient.js)
 import { 
     getDashboardSummary, 
     getRevenueByMonth, 
     getRecentBookings, 
     downloadRevenueReport 
-} from '../api/axiosClient'; 
+} from '../api/adminDashboard'; 
 
 export default function DashboardMain() {
     // 1. Khởi tạo State
