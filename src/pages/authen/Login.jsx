@@ -101,7 +101,10 @@ export default function Login() {
       };
       setUserInfo(userInfo);
       console.log("User info từ token:", userInfo);
-      
+      if(userInfo.role === "ADMIN") {
+        navigate("/admin");
+        return;
+      }
       navigate("/");
     } catch (err) {
       setError(err.message || "Đăng nhập thất bại. Vui lòng thử lại.");
@@ -181,6 +184,11 @@ export default function Login() {
                   <span className="font-bold text-black cursor-pointer"> Đăng ký miễn phí</span>
                 </Link>
               </div>
+              <div className="mt-2">
+                <Link to="/">
+                  <span className="font-bold text-black cursor-pointer"> Back home</span>
+                </Link>
+            </div>
             </div>
           </form>
         </div>

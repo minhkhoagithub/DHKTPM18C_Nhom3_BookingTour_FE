@@ -29,9 +29,8 @@ export default function Footer() {
             <div>
                 <h3 className='text-lg font-semibold mb-4'>Contact Us</h3>
                 <ul className='space-y-2 text-sm'>
-                    <li>123 Travel Street, City, Country</li>
-                    <li>Phone: +1 234 567 890</li>
-                    <li>Email: info@tripbuddy.com</li>
+                    <li>Phone: 0328462264</li>
+                    <li>Email: minhkhoa0753@gmail.com</li>
                 </ul>
             </div>
             <div>

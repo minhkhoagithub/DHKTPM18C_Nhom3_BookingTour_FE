@@ -1,4 +1,4 @@
-import { Route, Router, Routes } from "react-router-dom";
+import { Navigate, Route, Router, Routes } from "react-router-dom";
 import Home from "../pages/home/Home";
 import About from "../pages/about/About";
 import Contact from "../pages/contact/Contact";
@@ -39,6 +39,7 @@ import Profile from "../components/Profile";
 import Favourite from "../components/Favourite";
 import AccountSettings from "../components/AccountSettings";
 import Help from "../components/Help";
+import { getUserInfo } from "../services/authService";
 
 export default function AppRouter() {
   return (
@@ -91,7 +92,39 @@ export default function AppRouter() {
           }
         />
       </Route>
-      <Route path="/admin" element={<AdminLayout />}>
+      {/* <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<DashboardMain />} />
+        <Route path="tours" element={<ToursAdmin />} />
+        <Route path="bookings" element={<BookingsAdmin />} />
+        <Route path="users" element={<UsersAdmin />} />
+        <Route path="users/deleted" element={<DeletedCustomers />} />
+        <Route path="promotions" element={<PromotionsAdmin />} />
+        <Route path="departures" element={<DeparturesAdmin />} />
+        <Route path="articles" element={<ArticlesAdmin />} />
+        <Route path="reviews" element={<ReviewsAdmin />} />
+        <Route path="payments" element={<PaymentsAdmin />} />
+        <Route path="invoices" element={<InvoicesAdmin />} />
+        <Route path="price-policies" element={<PricePoliciesAdmin />} />
+        <Route path="settings" element={<SettingsAdmin />} />
+      </Route> */}
+      <Route
+        path="/admin"
+        element={
+          (() => {
+            const user = getUserInfo();
+
+            if (!user) {
+              return <Navigate to="/login" replace />;
+            }
+
+            if (user.role !== "ADMIN") {
+              return <Navigate to="/" replace />;
+            }
+
+            return <AdminLayout />;
+          })()
+        }
+      >
         <Route index element={<DashboardMain />} />
         <Route path="tours" element={<ToursAdmin />} />
         <Route path="bookings" element={<BookingsAdmin />} />

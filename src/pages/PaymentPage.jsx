@@ -12,15 +12,18 @@ export default function PaymentPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const BANK_ID = "VCB";
+ 
 
   const { invoiceId, totalAmount, promotionRef, discount } =
     location.state || {};
-  const ACCOUNT_NUMBER = "0123456789";
-  const ACCOUNT_NAME = "CONG TY ABC";
-  const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NUMBER}-compact2.png?amount=${totalAmount}&addInfo=PAY-${invoiceId}&accountName=${encodeURIComponent(
-    ACCOUNT_NAME
-  )}`;
+  // Config VietQR with Shinhan Bank
+const BANK_ID = "SHBVN";  
+const ACCOUNT_NUMBER = "0328462264";   
+const ACCOUNT_NAME = "LE MINH KHOA";  
+
+// Generate QR URL
+const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NUMBER}-compact2.png?amount=${totalAmount}&addInfo=PAY-${invoiceId}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
+
   if (!invoiceId) {
     navigate("/");
     return null;

@@ -6,12 +6,14 @@ import {
     Bell, UserCircle, Search, Tag, Plane, CreditCard, FileText, DollarSign,
     LogOut, User as UserIcon, Shield, PenSquare, MessageSquare
 } from 'lucide-react';
+import { getUserInfo } from '../services/authService';
 
 export default function AdminLayout () {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const location = useLocation();
     const profileRef = useRef(null);
+    const user = getUserInfo(); // Giả sử hàm này lấy thông tin user hiện tại
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -38,7 +40,7 @@ export default function AdminLayout () {
             name: 'Nội dung',
             items: [
                 { name: 'Articles', icon: <PenSquare size={20} />, path: '/admin/articles' },
-                { name: 'Reviews', icon: <MessageSquare size={20} />, path: '/admin/reviews' },
+                // { name: 'Reviews', icon: <MessageSquare size={20} />, path: '/admin/reviews' },
             ]
         },
         {
@@ -50,12 +52,12 @@ export default function AdminLayout () {
                 // { name: 'Price Policies', icon: <DollarSign size={20} />, path: '/admin/price-policies' },
             ]
         },
-        {
-            name: 'Hệ thống',
-            items: [
-                 { name: 'Settings', icon: <Settings size={20} />, path: '/admin/settings' },
-            ]
-        }
+        // {
+        //     name: 'Hệ thống',
+        //     items: [
+        //          { name: 'Settings', icon: <Settings size={20} />, path: '/admin/settings' },
+        //     ]
+        // }
     ];
 
     const isActive = (path) => {
@@ -114,13 +116,13 @@ export default function AdminLayout () {
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
-                        <button className="text-gray-500 hover:text-gray-800 relative">
+                        {/* <button className="text-gray-500 hover:text-gray-800 relative">
                             <Bell size={24} />
                             <span className="absolute -top-1 -right-1 flex h-3 w-3">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
                             </span>
-                        </button>
+                        </button> */}
                          <div className="relative" ref={profileRef}>
                             <button onClick={() => setIsProfileOpen(!isProfileOpen)} className="flex items-center gap-2 cursor-pointer">
                                 <UserCircle size={32} className="text-gray-600"/>

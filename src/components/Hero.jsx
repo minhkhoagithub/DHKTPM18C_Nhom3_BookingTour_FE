@@ -30,10 +30,10 @@ export default function Hero() {
                <div className='relative max-w-7xl mx-auto'>
                 <div className='flex h-[650px] justify-center items-center lg:pt-0 pt-20'>
                     <div className='flex flex-col space-y-8 justify-center items-center text-center px-5 md:px-0'>
-                        <h1 className='text-white font-bold text-4xl lg:text-6xl'>Discover Your Next Adventure</h1>
-                        <p className='text-white lg:text-lg lg:w-[700px]'>Explore breathtaking destinations, create unforgettable memories and embark on the journey of a lifetime.</p>
+                        <h1 className='text-white font-bold text-4xl lg:text-6xl'>Khám phá cuộc phiêu lưu tiếp theo của bạn</h1>
+                        <p className='text-white lg:text-lg lg:w-[700px]'>Khám phá những điểm đến ngoạn mục, tạo nên những kỷ niệm khó quên và bắt đầu chuyến hành trình đáng nhớ trong đời.</p>
                         <Link to='/tours'>
-                                <p className='bg-red-500 px-3 py-2 rounded-md text-white'>Start Exploring</p>
+                                <p className='bg-red-500 px-3 py-2 rounded-md text-white'>Bắt đầu khám phá</p>
                                 </Link>
                     </div>
                 </div>
@@ -51,10 +51,10 @@ export default function Hero() {
                <div className='relative max-w-7xl mx-auto'>
                 <div className='flex h-[650px] justify-center items-center lg:pt-0 pt-20'>
                     <div className='flex flex-col space-y-8 justify-center items-center text-center px-5 md:px-0'>
-                        <h1 className='text-white font-bold text-4xl lg:text-6xl'>Discover Your Next Adventure</h1>
-                        <p className='text-white lg:text-lg lg:w-[700px]'>Explore breathtaking destinations, create unforgettable memories and embark on the journey of a lifetime.</p>
+                        <h1 className='text-white font-bold text-4xl lg:text-6xl'>Khám phá cuộc phiêu lưu tiếp theo của bạn</h1>
+                        <p className='text-white lg:text-lg lg:w-[700px]'>Khám phá những điểm đến ngoạn mục, tạo nên những kỷ niệm khó quên và bắt đầu chuyến hành trình đáng nhớ trong đời.</p>
                         <Link to='/tours'>
-                                <p className='bg-red-500 px-3 py-2 rounded-md text-white'>Start Exploring</p>
+                                <p className='bg-red-500 px-3 py-2 rounded-md text-white'>Bắt đầu khám phá</p>
                                 </Link>
                     </div>
                 </div>
@@ -72,10 +72,10 @@ export default function Hero() {
                <div className='relative max-w-7xl mx-auto'>
                 <div className='flex h-[650px] justify-center items-center lg:pt-0 pt-20'>
                     <div className='flex flex-col space-y-8 justify-center items-center text-center px-5 md:px-0'>
-                        <h1 className='text-white font-bold text-4xl lg:text-6xl'>Discover Your Next Adventure</h1>
-                        <p className='text-white lg:text-lg lg:w-[700px]'>Explore breathtaking destinations, create unforgettable memories and embark on the journey of a lifetime.</p>
+                        <h1 className='text-white font-bold text-4xl lg:text-6xl'>Khám phá cuộc phiêu lưu tiếp theo của bạn</h1>
+                        <p className='text-white lg:text-lg lg:w-[700px]'>Khám phá những điểm đến ngoạn mục, tạo nên những kỷ niệm khó quên và bắt đầu chuyến hành trình đáng nhớ trong đời.</p>
                        <Link to='/tours'>
-                               <p className='bg-red-500 px-3 py-2 rounded-md text-white'>Start Exploring</p>
+                               <p className='bg-red-500 px-3 py-2 rounded-md text-white'>Bắt đầu khám phá</p>
                         </Link>
                     </div>
                 </div>

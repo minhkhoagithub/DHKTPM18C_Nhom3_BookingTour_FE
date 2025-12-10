@@ -3,6 +3,7 @@ import TopBanner from '../../components/TopBanner';
 import {  getTourById } from '../../services/tourService';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getUserInfo } from '../../services/authService';
+import PromotionCard from '../../components/PromotionCard';
 
 export default function TourDetail() {
 
@@ -104,6 +105,8 @@ if (loading) {
                     <div className="md:col-span-2">
                         <h2 className="text-3xl font-bold mb-4 font-tour">{tour.name}</h2>
                         {/* <p className="text-gray-600 mb-6 text-lg">{tour.description}</p> */}
+                        <PromotionCard tourId={tour.tourId
+} />
                         <p
   className={
     "text-gray-600 mb-6 text-lg " +
