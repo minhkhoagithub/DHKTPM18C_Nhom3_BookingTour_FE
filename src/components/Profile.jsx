@@ -2,6 +2,43 @@ import React, { useEffect, useState } from "react";
 import { getCurrentUser, logout } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 
+/* ===================== HUY HIỆU HẠNG ===================== */
+const getTierBadge = (tier) => {
+  switch (tier) {
+    case "BRONZE":
+      return (
+        <span className="px-3 py-1 rounded-full text-sm font-semibold bg-orange-100 text-orange-700 border border-orange-300 flex items-center gap-1">
+          Bronze
+        </span>
+      );
+    case "SILVER":
+      return (
+        <span className="px-3 py-1 rounded-full text-sm font-semibold bg-gray-200 text-gray-700 border border-gray-300 flex items-center gap-1">
+          Silver
+        </span>
+      );
+    case "GOLD":
+      return (
+        <span className="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-200 text-yellow-800 border border-yellow-400 flex items-center gap-1">
+          Gold
+        </span>
+      );
+    case "PLATINUM":
+      return (
+        <span className="px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-700 border border-blue-300 flex items-center gap-1">
+          Platinum
+        </span>
+      );
+    default:
+      return (
+        <span className="px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-600 border border-gray-300 flex items-center gap-1">
+          Guest
+        </span>
+      );
+  }
+};
+/* ========================================================= */
+
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -67,14 +104,10 @@ export default function Profile() {
             <span>{user.address || "Chưa cập nhật"}</span>
           </div>
 
-          {/* <div className="flex justify-between">
-            <span className="font-semibold">Mã khách hàng:</span>
-            <span className="font-mono">{user.customerId}</span>
-          </div> */}
-
-          <div className="flex justify-between">
+          {/* HUY HIỆU RANKING */}
+          <div className="flex justify-between items-center">
             <span className="font-semibold">Hạng thành viên:</span>
-            <span>{user.loyaltyTier || "GUEST"}</span>
+            {getTierBadge(user.loyaltyTier)}
           </div>
 
           <div className="flex justify-between">
