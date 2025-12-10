@@ -33,6 +33,12 @@ import StaffQueryPage from "../pages/staff/StaffQueryPage";
 import { PrivateStaffRoute } from "./PrivateRoute";
 import BlogDetail from "../pages/blog/BlogDetail";
 import DeletedCustomers from "../components/admin/DeletedCustomers";
+import MyBookings from "../components/MyBookings";
+import BookingDetail from "../components/BookingDetails";
+import Profile from "../components/Profile";
+import Favourite from "../components/Favourite";
+import AccountSettings from "../components/AccountSettings";
+import Help from "../components/Help";
 
 export default function AppRouter() {
   return (
@@ -48,6 +54,13 @@ export default function AppRouter() {
         <Route path="tour/:tourId" element={<TourDetail />} />
         <Route path="booking" element={<BookingPage />} />
         <Route path="payment" element={<PaymentPage />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="favorites" element={<Favourite />} />
+        <Route path="settings" element={<AccountSettings />} />
+        <Route path="help" element={<Help />} />
+
+        <Route path="/my-bookings" element={<MyBookings />} />
+        <Route path="/my-bookings/:id" element={<BookingDetail />} />
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />

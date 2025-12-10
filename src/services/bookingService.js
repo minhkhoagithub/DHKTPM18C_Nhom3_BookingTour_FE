@@ -10,6 +10,7 @@ export const getAllBookings = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
                 
             },
         });
@@ -37,7 +38,7 @@ export const getBookingById = async (id) => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                // "Authorization": `Bearer ${yourToken}`
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
             },
         });
 
@@ -61,6 +62,7 @@ export const createBooking = async (bookingData) => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                // "Authorization": `Bearer ${localStorage.getItem("token")}`,
             },
             body: JSON.stringify(bookingData)
         });
@@ -85,7 +87,9 @@ export const executePayment = async (invoiceId, paymentData) => {
             `http://localhost:8080/api/bookings/${invoiceId}/pay`, 
             paymentData
         );
-        return response.data; // Trả về PaymentResponseDTO
+        console.log("Payment response:", response);
+        return response.data; 
+        
     } catch (error) {
         // ... (xử lý lỗi)
     }
